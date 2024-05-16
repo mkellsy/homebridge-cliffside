@@ -1,0 +1,50 @@
+{
+    "version": "1.0.1",
+    "name": "@mkellsy/homebridge-cliffside",
+    "displayName": "Homebridge Cliffside",
+    "description": "This is a highly customized plugin for a single location.",
+    "author": "Michael Kellsy",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mkellsy/homebridge-cliffside"
+    },
+    "homepage": "https://github.com/mkellsy/homebridge-cliffside",
+    "main": "lib/index.js",
+    "keywords": [
+        "homebridge-plugin"
+    ],
+    "files": [
+        "/lib",
+        "/bin",
+        "authority"
+    ],
+    "bin": {
+        "cliffside": "bin/cliffside"
+    },
+    "scripts": {
+        "build": "./build",
+        "buttons": "npm run build && ./bin/cliffside -d buttons",
+        "devices": "npm run build && ./bin/cliffside -d devices",
+        "keypads": "npm run build && ./bin/cliffside -d devices",
+        "watch": "npm run build && npm link && nodemon",
+        "pair": "npm run build && ./bin/cliffside -d pair",
+        "prepublishOnly": "npm run build"
+    },
+    "peerDependencies": {
+        "homebridge": "^1.8.1"
+    },
+    "devDependencies": {
+        "@mkellsy/baf-client": "^1.1.9",
+        "@mkellsy/hap-device": "^1.1.8",
+        "@mkellsy/leap-client": "^1.1.9",
+        "@types/debug": "^4.1.12",
+        "@types/node": "^20.11.0",
+        "colors": "^1.4.0",
+        "commander": "^10.0.1",
+        "esbuild": "^0.20.2",
+        "js-logger": "^1.6.1",
+        "nodemon": "^3.1.0",
+        "typescript": "^5.3.3"
+    }
+}

@@ -39,12 +39,13 @@ cliffside buttons
 This will print all button names and IDs. These are the IDs that will be used in lambdas, for the `button` field.
 
 ## Configuration
-This plugin doesn't require any configuration other than the platform to work. The default is to expose remotes, keypads, and sensors for LEAP connections, and fans, lights, and sensors for Big Ass Fan connections.
+This plugin doesn't require any configuration other than the platform to work. The default is to expose remotes, keypads, and sensors for LEAP connections, and fans, and lights for Big Ass Fan connections.
 
 ```json
 {
     "platforms": [
         {
+            "name": "Cliffside",
             "platform": "Cliffside"
         }
     ]
@@ -57,20 +58,38 @@ You can turn on other devices too. These devices are not turned on because they 
 {
     "platforms": [
         {
+            "name": "Cliffside",
             "platform": "Cliffside",
-            "cco": false,
-            "dimmers": false,
-            "fans": true,
-            "keypads": true,
-            "sensors": true,
-            "remotes": true,
-            "shades": false,
-            "strips": false,
-            "switches": false
+            "leap": {
+                "cco": false,
+                "dimmers": false,
+                "fans": false,
+                "keypads": true,
+                "sensors": true,
+                "remotes": true,
+                "shades": false,
+                "strips": false,
+                "switches": false,
+                "multiplier": 1
+            },
+            "baf": {
+                "cco": false,
+                "dimmers": true,
+                "fans": true,
+                "keypads": false,
+                "sensors": false,
+                "remotes": false,
+                "shades": false,
+                "strips": false,
+                "switches": false,
+                "multiplier": 100
+            }
         }
     ]
 }
 ```
+
+> The "multiplier" field modifies the level input. LEAP uses 1 - 100 while Big Ass Fans uses 0 - 1.
 
 ## Support
 I offer not support for this plugin, it is published only for personal use.

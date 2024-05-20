@@ -91,5 +91,22 @@ You can turn on other devices too. These devices are not turned on because they 
 
 > The "multiplier" field modifies the level input. LEAP uses 1 - 100 while Big Ass Fans uses 0 - 1.
 
+## Lambdas
+This plugin allows writing lambda functions that can be assigned to buttons. That follow this pattern.
+
+```
+interface Action {
+    button: string;
+
+    action(state: Action, devices: Map<string, IDevice>): void;
+}
+```
+
+> Actions are "Press", "DoublePress", "LongPress", and "Release".
+
+Lambdas need to be stored in a folder at the same level as `.homebridge`. The folder is `~/house`.
+
+[Example Lambdas](https://github.com/mkellsy/cliffside-lambdas/tree/main/src)
+
 ## Support
 I offer not support for this plugin, it is published only for personal use.

@@ -2,7 +2,7 @@
 This is a highly customized plugin for a single location. This requires [Homebridge](https://homebridge.io/) to run.
 
 ## CLI
-Pairing a processor
+**Pairing a processor**
 
 ```
 cliffside pair
@@ -14,7 +14,7 @@ This will automatically discover processors. You will need to press the pairing 
 
 After you have a processor or bridge paired, you can start Homebridge.
 
-Listing all controllable devices.
+**Listing all controllable devices**
 
 ```
 cliffside devices
@@ -22,7 +22,7 @@ cliffside devices
 
 This will print all device names and IDs that are controllable in lambdas.
 
-List all remotes and keypads.
+**List all remotes and keypads**
 
 ```
 cliffside keypads
@@ -30,7 +30,7 @@ cliffside keypads
 
 This will print all keypad device names and IDs.
 
-List all buttons.
+**List all buttons**
 
 ```
 cliffside buttons

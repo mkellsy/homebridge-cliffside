@@ -39,7 +39,7 @@ cliffside buttons
 This will print all button names and IDs. These are the IDs that will be used in lambdas, for the `button` field.
 
 ## Configuration
-This plugin doesn't require any configuration other than the platform to work. The default is to expose remotes, keypads and sensors.
+This plugin doesn't require any configuration other than the platform to work. The default is to expose remotes, keypads, and sensors for LEAP connections, and fans, lights, and sensors for Big Ass Fan connections.
 
 ```json
 {

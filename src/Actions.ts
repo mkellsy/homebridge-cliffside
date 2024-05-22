@@ -4,6 +4,7 @@ import Path from "path";
 
 import { Action } from "./Interfaces/Action";
 import { Action as IAction, Button, Device, DeviceType } from "@mkellsy/hap-device";
+import { Logging } from "homebridge";
 
 const CONTROLLABLE_TYPES = [
     DeviceType.Contact,
@@ -15,11 +16,17 @@ const CONTROLLABLE_TYPES = [
 ];
 
 export class Actions {
+    private readonly log: Logging;
+
     private devices: Map<string, Device> = new Map();
     private actions: Map<string, Action> = new Map();
 
-    constructor() {
+    constructor(log: Logging) {
+        this.log = log;
+
         const directory = Path.join(Os.homedir(), "house");
+
+        this.log.debug(`Loading Lambdas ${directory}`);
 
         if (Fs.existsSync(directory)) {
             Fs.readdirSync(directory).forEach((item) => {
@@ -28,6 +35,8 @@ export class Actions {
 
                 if (file.isFile() && Path.extname(filename) === ".js") {
                     const action = require(filename);
+
+                    this.log.debug(`Lambda Found ${filename}`);
 
                     if (action != null && Array.isArray(action)) {
                         for (const item of action) {

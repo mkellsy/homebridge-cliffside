@@ -27,7 +27,7 @@ export class Platform implements DynamicPlatformPlugin {
     private readonly homebridge: API;
 
     constructor(log: Logging, config: PlatformConfig, homebridge: API) {
-        this.actions = new Actions();
+        this.actions = new Actions(log);
 
         this.log = log;
         this.config = { ...defaults, ...config };

@@ -46,7 +46,7 @@ export abstract class Accessories {
                     return undefined;
                 }
 
-                return new Humidity(system, homebridge, device as IKeypad, config, log);
+                return new Humidity(system, homebridge, device, config, log);
 
             case DeviceType.Keypad:
                 if (config[system].keypads === false) {

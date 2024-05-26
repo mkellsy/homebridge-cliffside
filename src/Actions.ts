@@ -1,24 +1,25 @@
+import * as Interfaces from "@mkellsy/hap-device";
+
 import Fs from "fs";
 import Os from "os";
 import Path from "path";
 
 import { Action } from "./Interfaces/Action";
-import { Action as IAction, Button, Device, DeviceState, DeviceType } from "@mkellsy/hap-device";
 import { Logging } from "homebridge";
 
 const CONTROLLABLE_TYPES = [
-    DeviceType.Contact,
-    DeviceType.Dimmer,
-    DeviceType.Fan,
-    DeviceType.Shade,
-    DeviceType.Strip,
-    DeviceType.Switch
+    Interfaces.DeviceType.Contact,
+    Interfaces.DeviceType.Dimmer,
+    Interfaces.DeviceType.Fan,
+    Interfaces.DeviceType.Shade,
+    Interfaces.DeviceType.Strip,
+    Interfaces.DeviceType.Switch
 ];
 
 export class Actions {
     private readonly log: Logging;
 
-    private devices: Map<string, Device> = new Map();
+    private devices: Map<string, Interfaces.Device> = new Map();
     private actions: Map<string, Action> = new Map();
 
     constructor(log: Logging) {
@@ -52,11 +53,15 @@ export class Actions {
         }
     }
 
-    public emit(button: Button, state: IAction, activate: () => void): void {
+    public emit(
+        device: Interfaces.Device,
+        button: Interfaces.Button,
+        state: Interfaces.Action,
+    ): void {
         const action = this.actions.get(button.id);
 
         if (action != null) {
-            action.action(state, this.devices, activate);
+            action.action(device, button, state, this.devices);
         }
     }
 
@@ -68,7 +73,7 @@ export class Actions {
         return this.actions.get(button);
     }
 
-    public set(device: Device): void {
+    public set(device: Interfaces.Device): void {
         if (CONTROLLABLE_TYPES.indexOf(device.type) === -1) {
             return;
         }

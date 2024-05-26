@@ -68,16 +68,23 @@ export class Platform implements DynamicPlatformPlugin {
         const accessory = Accessories.get(this.homebridge, device);
 
         this.actions.emit(button, action, () => {
+            if (device.type !== Interfaces.DeviceType.Keypad) {
+                return;
+            }
+
+            if (button.led == null) {
+                return;
+            }
+
             if (device.type === Interfaces.DeviceType.Keypad) {
                 const keypad = device as Interfaces.Keypad;
+                const buttons = keypad.buttons.filter((item) => item.led != null);
 
-                for (let i = 0; i < keypad.buttons.length; i++) {
-                    if (keypad.buttons[i].led != null) {
-                        keypad.set({
-                            led: keypad.buttons[i].led,
-                            state: keypad.buttons[i].id === button.id ? "On" : "Off",
-                        });
-                    }
+                for (let i = 0; i < buttons.length; i++) {
+                    keypad.set({
+                        led: buttons[i].led,
+                        state: buttons[i].id === button.id ? "On" : "Off",
+                    });
                 }
             }
         });

@@ -11,6 +11,7 @@ const CONTROLLABLE_TYPES = [
     Interfaces.DeviceType.Contact,
     Interfaces.DeviceType.Dimmer,
     Interfaces.DeviceType.Fan,
+    Interfaces.DeviceType.Keypad,
     Interfaces.DeviceType.Shade,
     Interfaces.DeviceType.Strip,
     Interfaces.DeviceType.Switch
@@ -53,15 +54,11 @@ export class Actions {
         }
     }
 
-    public emit(
-        device: Interfaces.Device,
-        button: Interfaces.Button,
-        state: Interfaces.Action,
-    ): void {
+    public emit(button: Interfaces.Button, state: Interfaces.Action): void {
         const action = this.actions.get(button.id);
 
         if (action != null) {
-            action.action(device, button, state, this.devices);
+            action.action(button, state, this.devices);
         }
     }
 

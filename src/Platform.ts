@@ -67,7 +67,7 @@ export class Platform implements DynamicPlatformPlugin {
     private onAction = (device: Interfaces.Device, button: Interfaces.Button, action: Interfaces.Action): void => {
         const accessory = Accessories.get(this.homebridge, device);
 
-        this.actions.emit(device, button, action);
+        this.actions.emit(button, action);
 
         if (accessory == null || accessory.onAction == null) {
             return;

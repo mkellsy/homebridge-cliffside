@@ -1,5 +1,5 @@
 {
-    "version": "1.1.1",
+    "version": "1.1.2",
     "name": "@mkellsy/homebridge-cliffside",
     "displayName": "Homebridge Cliffside",
     "description": "This is a highly customized plugin for a single location.",
@@ -23,12 +23,12 @@
         "cliffside": "bin/cliffside"
     },
     "scripts": {
-        "build": "./build",
-        "buttons": "npm run build && ./bin/cliffside -d buttons",
-        "devices": "npm run build && ./bin/cliffside -d devices",
-        "keypads": "npm run build && ./bin/cliffside -d devices",
+        "build": "node ./build",
+        "buttons": "npm run build && node ./bin/cliffside -d buttons",
+        "devices": "npm run build && node ./bin/cliffside -d devices",
+        "keypads": "npm run build && node ./bin/cliffside -d devices",
         "watch": "npm run build && npm link && nodemon",
-        "pair": "npm run build && ./bin/cliffside -d pair",
+        "pair": "npm run build && node ./bin/cliffside -d pair",
         "prepublishOnly": "npm run build"
     },
     "peerDependencies": {

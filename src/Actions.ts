@@ -3,7 +3,7 @@ import Os from "os";
 import Path from "path";
 
 import { Action } from "./Interfaces/Action";
-import { Action as IAction, Button, Device, DeviceType } from "@mkellsy/hap-device";
+import { Action as IAction, Button, Device, DeviceState, DeviceType } from "@mkellsy/hap-device";
 import { Logging } from "homebridge";
 
 const CONTROLLABLE_TYPES = [
@@ -52,11 +52,11 @@ export class Actions {
         }
     }
 
-    public emit(button: Button, state: IAction): void {
+    public emit(button: Button, state: IAction, led: (state: Partial<DeviceState>) => void): void {
         const action = this.actions.get(button.id);
 
         if (action != null) {
-            action.action(state, this.devices);
+            action.action(state, this.devices, led);
         }
     }
 

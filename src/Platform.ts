@@ -2,7 +2,7 @@ import * as Baf from "@mkellsy/baf-client";
 import * as Leap from "@mkellsy/leap-client";
 
 import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig } from "homebridge";
-import { Action, Button, Device as IDevice, DeviceState } from "@mkellsy/hap-device";
+import { Action, Button, Device as IDevice, DeviceState, DeviceType } from "@mkellsy/hap-device";
 
 import { Accessories } from "./Accessories";
 import { Actions } from "./Actions";
@@ -66,8 +66,8 @@ export class Platform implements DynamicPlatformPlugin {
 
     private onAction = (device: IDevice, button: Button, action: Action): void => {
         const accessory = Accessories.get(this.homebridge, device);
-        
-        this.actions.emit(button, action);
+
+        this.actions.emit(button, action, device.set);
 
         if (accessory == null || accessory.onAction == null) {
             return;

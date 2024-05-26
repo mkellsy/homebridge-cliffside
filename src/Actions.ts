@@ -52,11 +52,11 @@ export class Actions {
         }
     }
 
-    public emit(button: Button, state: IAction, led: (state: Partial<DeviceState>) => void): void {
+    public emit(button: Button, state: IAction, activate: () => void): void {
         const action = this.actions.get(button.id);
 
         if (action != null) {
-            action.action(state, this.devices, led);
+            action.action(state, this.devices, activate);
         }
     }
 

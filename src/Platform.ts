@@ -1,8 +1,8 @@
 import * as Baf from "@mkellsy/baf-client";
 import * as Leap from "@mkellsy/leap-client";
+import * as Interfaces from "@mkellsy/hap-device";
 
 import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig } from "homebridge";
-import { Action, Button, Device as IDevice, DeviceState, DeviceType } from "@mkellsy/hap-device";
 
 import { Accessories } from "./Accessories";
 import { Actions } from "./Actions";
@@ -50,7 +50,7 @@ export class Platform implements DynamicPlatformPlugin {
         accessories.set(accessory.UUID, accessory);
     }
 
-    private onAvailable = (system: System, devices: IDevice[]): void => {
+    private onAvailable = (system: System, devices: Interfaces.Device[]): void => {
         for (const device of devices) {
             const accessory = Accessories.create(system, this.homebridge, device, this.config, this.log);
 
@@ -64,10 +64,23 @@ export class Platform implements DynamicPlatformPlugin {
         }
     };
 
-    private onAction = (device: IDevice, button: Button, action: Action): void => {
+    private onAction = (device: Interfaces.Device, button: Interfaces.Button, action: Interfaces.Action): void => {
         const accessory = Accessories.get(this.homebridge, device);
 
-        this.actions.emit(button, action, device.set);
+        this.actions.emit(button, action, () => {
+            if (device.type === Interfaces.DeviceType.Keypad) {
+                const keypad = device as Interfaces.Keypad;
+
+                for (let i = 0; i < keypad.buttons.length; i++) {
+                    if (keypad.buttons[i].led != null) {
+                        keypad.set({
+                            led: keypad.buttons[i].led,
+                            state: keypad.buttons[i].id === button.id ? "On" : "Off",
+                        });
+                    }
+                }
+            }
+        });
 
         if (accessory == null || accessory.onAction == null) {
             return;
@@ -76,7 +89,7 @@ export class Platform implements DynamicPlatformPlugin {
         accessory.onAction(button, action);
     };
 
-    private onUpdate = (device: IDevice, state: DeviceState): void => {
+    private onUpdate = (device: Interfaces.Device, state: Interfaces.DeviceState): void => {
         const accessory = Accessories.get(this.homebridge, device);
 
         if (accessory == null || accessory.onUpdate == null) {

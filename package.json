@@ -35,7 +35,7 @@
         "homebridge": "^1.8.1"
     },
     "devDependencies": {
-        "@mkellsy/baf-client": "^1.2.3",
+        "@mkellsy/baf-client": "^1.2.4",
         "@mkellsy/hap-device": "^1.2.1",
         "@mkellsy/leap-client": "^1.2.3",
         "@types/debug": "^4.1.12",

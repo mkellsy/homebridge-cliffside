@@ -69,8 +69,7 @@ You can turn on other devices too. These devices are not turned on because they 
                 "remotes": true,
                 "shades": false,
                 "strips": false,
-                "switches": false,
-                "multiplier": 1
+                "switches": false
             },
             "baf": {
                 "cco": false,
@@ -81,15 +80,12 @@ You can turn on other devices too. These devices are not turned on because they 
                 "remotes": false,
                 "shades": false,
                 "strips": false,
-                "switches": false,
-                "multiplier": 100
+                "switches": false
             }
         }
     ]
 }
 ```
-
-> The "multiplier" field modifies the level input. LEAP uses 1 - 100 while Big Ass Fans uses 0 - 1.
 
 ## Lambdas
 This plugin allows writing lambda functions that can be assigned to buttons. That follow this pattern.

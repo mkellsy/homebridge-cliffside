@@ -8,8 +8,7 @@ export const defaults = {
         remotes: true,
         shades: false,
         strips: false,
-        switches: false,
-        multiplier: 1
+        switches: false
     },
     baf: {
         cco: false,
@@ -20,7 +19,6 @@ export const defaults = {
         remotes: false,
         shades: false,
         strips: false,
-        switches: false,
-        multiplier: 100
+        switches: false
     }
 };

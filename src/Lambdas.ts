@@ -4,7 +4,7 @@ import Fs from "fs";
 import Os from "os";
 import Path from "path";
 
-import { Action } from "./Interfaces/Action";
+import { Lambda } from "./Interfaces/Lambda";
 import { Logging } from "homebridge";
 
 const CONTROLLABLE_TYPES = [
@@ -17,11 +17,11 @@ const CONTROLLABLE_TYPES = [
     Interfaces.DeviceType.Switch
 ];
 
-export class Actions {
+export class Lambdas {
     private readonly log: Logging;
 
     private devices: Map<string, Interfaces.Device> = new Map();
-    private actions: Map<string, Action> = new Map();
+    private lambdas: Map<string, Lambda> = new Map();
 
     constructor(log: Logging) {
         this.log = log;
@@ -43,11 +43,11 @@ export class Actions {
                     if (action != null && Array.isArray(action)) {
                         for (const item of action) {
                             if (item.button != null) {
-                                this.actions.set(item.button, item);
+                                this.lambdas.set(item.button, item);
                             }
                         }
                     } else if (action != null && typeof action === "object" && action.button != null) {
-                        this.actions.set(action.button, action);
+                        this.lambdas.set(action.button, action);
                     }
                 }
             });
@@ -55,7 +55,7 @@ export class Actions {
     }
 
     public emit(button: Interfaces.Button, state: Interfaces.Action): void {
-        const action = this.actions.get(button.id);
+        const action = this.lambdas.get(button.id);
 
         if (action != null) {
             action.action(button, state, this.devices);
@@ -63,11 +63,11 @@ export class Actions {
     }
 
     public has(button: string): boolean {
-        return this.actions.has(button);
+        return this.lambdas.has(button);
     }
 
-    public get(button: string): Action | undefined {
-        return this.actions.get(button);
+    public get(button: string): Lambda | undefined {
+        return this.lambdas.get(button);
     }
 
     public set(device: Interfaces.Device): void {

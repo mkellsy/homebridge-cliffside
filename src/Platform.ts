@@ -5,8 +5,8 @@ import * as Interfaces from "@mkellsy/hap-device";
 import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig } from "homebridge";
 
 import { Accessories } from "./Accessories";
-import { Actions } from "./Actions";
 import { Device } from "./Interfaces/Device";
+import { Lambdas } from "./Lambdas";
 import { System } from "./Interfaces/System";
 
 import { defaults } from "./Interfaces/Config";
@@ -20,14 +20,14 @@ const plugin: string = "@mkellsy/homebridge-cliffside";
 export { accessories, devices, platform, plugin };
 
 export class Platform implements DynamicPlatformPlugin {
-    private readonly actions: Actions;
+    private readonly lambdas: Lambdas;
 
     private readonly log: Logging;
     private readonly config: PlatformConfig;
     private readonly homebridge: API;
 
     constructor(log: Logging, config: PlatformConfig, homebridge: API) {
-        this.actions = new Actions(log);
+        this.lambdas = new Lambdas(log);
 
         this.log = log;
         this.config = { ...defaults, ...config };
@@ -60,14 +60,14 @@ export class Platform implements DynamicPlatformPlugin {
                 Accessories.remove(this.homebridge, device);
             }
 
-            this.actions.set(device);
+            this.lambdas.set(device);
         }
     };
 
     private onAction = (device: Interfaces.Device, button: Interfaces.Button, action: Interfaces.Action): void => {
         const accessory = Accessories.get(this.homebridge, device);
 
-        this.actions.emit(button, action);
+        this.lambdas.emit(button, action);
 
         if (accessory == null || accessory.onAction == null) {
             return;

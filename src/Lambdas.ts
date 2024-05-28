@@ -54,12 +54,8 @@ export class Lambdas {
         }
     }
 
-    public emit(button: Interfaces.Button, state: Interfaces.Action): void {
-        const action = this.lambdas.get(button.id);
-
-        if (action != null) {
-            action.action(button, state, this.devices);
-        }
+    public emit(button: Interfaces.Button, action: Interfaces.Action): void {
+        this.lambdas.get(button.id)?.action(button, action, this.devices);
     }
 
     public has(button: string): boolean {

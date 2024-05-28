@@ -5,7 +5,7 @@ export interface Lambda {
 
     action(
         button: Interfaces.Button,
-        state: Interfaces.Action,
+        action: Interfaces.Action,
         devices: Map<string, Interfaces.Device>,
     ): void;
 }

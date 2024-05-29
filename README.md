@@ -63,7 +63,6 @@ You can turn on other devices too. These devices are not turned on because they 
             "leap": {
                 "cco": false,
                 "dimmers": false,
-                "fans": false,
                 "keypads": true,
                 "sensors": true,
                 "remotes": true,
@@ -72,15 +71,10 @@ You can turn on other devices too. These devices are not turned on because they 
                 "switches": false
             },
             "baf": {
-                "cco": false,
                 "dimmers": true,
                 "fans": true,
-                "keypads": false,
-                "sensors": false,
-                "remotes": false,
-                "shades": false,
-                "strips": false,
-                "switches": false
+                "sensors": true,
+                "switches": true
             }
         }
     ]

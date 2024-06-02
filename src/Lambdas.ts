@@ -15,6 +15,7 @@ const CONTROLLABLE_TYPES = [
     Interfaces.DeviceType.Shade,
     Interfaces.DeviceType.Strip,
     Interfaces.DeviceType.Switch,
+    Interfaces.DeviceType.Timeclock,
 ];
 
 export class Lambdas {
@@ -44,6 +45,8 @@ export class Lambdas {
                         for (const item of action) {
                             if (item.button != null) {
                                 this.lambdas.set(item.button, item);
+                            } else if (item.timeclock != null) {
+                                this.lambdas.set(item.timeclock, item);
                             }
                         }
                     } else if (action != null && typeof action === "object" && action.button != null) {
@@ -54,16 +57,32 @@ export class Lambdas {
         }
     }
 
-    public async emit(button: Interfaces.Button, action: Interfaces.Action): Promise<void> {
-        await this.lambdas.get(button.id)?.action(button, action, this.devices);
+    public async update(device: Interfaces.Device, state: Interfaces.DeviceState): Promise<void> {
+        const lambda = this.lambdas.get(device.id);
+
+        if (lambda == null || lambda.update == null) {
+            return;
+        }
+
+        await lambda.update(device, state, this.devices);
     }
 
-    public has(button: string): boolean {
-        return this.lambdas.has(button);
+    public async action(button: Interfaces.Button, action: Interfaces.Action): Promise<void> {
+        const lambda = this.lambdas.get(button.id);
+
+        if (lambda == null || lambda.action == null) {
+            return;
+        }
+
+        await lambda.action(button, action, this.devices);
     }
 
-    public get(button: string): Lambda | undefined {
-        return this.lambdas.get(button);
+    public has(id: string): boolean {
+        return this.lambdas.has(id);
+    }
+
+    public get(id: string): Lambda | undefined {
+        return this.lambdas.get(id);
     }
 
     public set(device: Interfaces.Device): void {

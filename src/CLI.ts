@@ -46,9 +46,11 @@ program.command("devices").action(() => {
             DeviceType.Contact,
             DeviceType.Dimmer,
             DeviceType.Fan,
+            DeviceType.Keypad,
             DeviceType.Shade,
             DeviceType.Strip,
             DeviceType.Switch,
+            DeviceType.Timeclock,
         ];
 
         const controllable = devices
@@ -66,24 +68,9 @@ program.command("devices").action(() => {
 program.command("keypads").action(() => {
     Logger.configure(program);
 
-    const devices: Device[] = [];
+    const types = [DeviceType.Keypad, DeviceType.Remote];
 
-    Promise.all([
-        new Promise<void>((resolve) => {
-            Leap.connect().on("Available", (items) => {
-                devices.push(...items);
-                resolve();
-            });
-        }),
-        new Promise<void>((resolve) => {
-            Baf.connect().on("Available", (items) => {
-                devices.push(...items);
-                resolve();
-            });
-        }),
-    ]).then(() => {
-        const types = [DeviceType.Keypad, DeviceType.Remote];
-
+    Leap.connect().on("Available", (devices) => {
         const keypads = devices
             .filter((device) => types.indexOf(device.type) >= 0)
             .sort((a, b) => (a.name < b.name ? -1 : 1));
@@ -99,24 +86,9 @@ program.command("keypads").action(() => {
 program.command("buttons").action(() => {
     Logger.configure(program);
 
-    const devices: Device[] = [];
+    const types = [DeviceType.Keypad, DeviceType.Remote];
 
-    Promise.all([
-        new Promise<void>((resolve) => {
-            Leap.connect().on("Available", (items) => {
-                devices.push(...items);
-                resolve();
-            });
-        }),
-        new Promise<void>((resolve) => {
-            Baf.connect().on("Available", (items) => {
-                devices.push(...items);
-                resolve();
-            });
-        }),
-    ]).then(() => {
-        const types = [DeviceType.Keypad, DeviceType.Remote];
-
+    Leap.connect().on("Available", (devices) => {
         const keypads = devices
             .filter((device) => types.indexOf(device.type) >= 0)
             .sort((a, b) => (a.name < b.name ? -1 : 1))
@@ -126,6 +98,23 @@ program.command("buttons").action(() => {
             for (const button of keypad.buttons) {
                 log.info(`${keypad.name} ${Colors.green(button.name)} ${Colors.cyan.dim(button.id)}`);
             }
+        }
+
+        process.exit();
+    });
+});
+
+program.command("timeclocks").action(() => {
+    Logger.configure(program);
+
+    Leap.connect().on("Available", (devices) => {
+        const timeclocks = devices
+            .filter((device) => device.type === DeviceType.Timeclock)
+            .sort((a, b) => (a.name < b.name ? -1 : 1))
+            .map((device) => device as Keypad);
+
+        for (const timeclock of timeclocks) {
+            log.info(`${timeclock.name} ${Colors.cyan.dim(timeclock.id)}`);
         }
 
         process.exit();

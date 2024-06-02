@@ -13,6 +13,7 @@ import { Shade } from "./Devices/Shade";
 import { Strip } from "./Devices/Strip";
 import { Switch } from "./Devices/Switch";
 import { Temperature } from "./Devices/Temperature";
+import { Timeclock } from "./Devices/Timeclock";
 
 import { Device } from "./Interfaces/Device";
 import { System, parseSystem } from "./Interfaces/System";
@@ -102,6 +103,13 @@ export abstract class Accessories {
                 }
 
                 return new Temperature(system, homebridge, device, config, log);
+
+            case DeviceType.Timeclock:
+                if (config[system].timeclocks === false) {
+                    return undefined;
+                }
+
+                return new Timeclock(system, homebridge, device, config, log);
         }
 
         return undefined;

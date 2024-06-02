@@ -63,7 +63,7 @@ export class Platform implements DynamicPlatformPlugin {
     ): Promise<void> => {
         const accessory = Accessories.get(this.homebridge, device);
 
-        await this.lambdas.emit(button, action);
+        await this.lambdas.action(button, action);
 
         if (accessory == null || accessory.onAction == null) {
             return;
@@ -72,8 +72,10 @@ export class Platform implements DynamicPlatformPlugin {
         accessory.onAction(button, action);
     };
 
-    private onUpdate = (device: Interfaces.Device, state: Interfaces.DeviceState): void => {
+    private onUpdate = async (device: Interfaces.Device, state: Interfaces.DeviceState): Promise<void> => {
         const accessory = Accessories.get(this.homebridge, device);
+
+        await this.lambdas.update(device, state);
 
         if (accessory == null || accessory.onUpdate == null) {
             return;

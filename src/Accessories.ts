@@ -15,10 +15,16 @@ import { Switch } from "./Devices/Switch";
 import { Temperature } from "./Devices/Temperature";
 
 import { Device } from "./Interfaces/Device";
-import { System } from "./Interfaces/System";
+import { System, parseSystem } from "./Interfaces/System";
 
 export abstract class Accessories {
-    public static create(system: System, homebridge: API, device: IDevice, config: PlatformConfig, log: Logging): Device | undefined {
+    public static create(homebridge: API, device: IDevice, config: PlatformConfig, log: Logging): Device | undefined {
+        const system: System = parseSystem(device);
+
+        if (config[system] == null) {
+            return undefined;
+        }
+
         switch (device.type) {
             case DeviceType.Contact:
                 if (config[system].cco === false) {

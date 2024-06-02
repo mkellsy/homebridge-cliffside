@@ -1,5 +1,5 @@
 {
-    "version": "1.3.1",
+    "version": "1.3.2",
     "name": "@mkellsy/homebridge-cliffside",
     "displayName": "Homebridge Cliffside",
     "description": "This is a highly customized plugin for a single location.",
@@ -23,7 +23,9 @@
         "cliffside": "bin/cliffside"
     },
     "scripts": {
-        "build": "node ./build",
+        "build": "npm run format && npm run lint && node ./build",
+        "lint": "eslint ./src/*.ts",
+        "format": "prettier --write .",
         "buttons": "npm run build && node ./bin/cliffside -d buttons",
         "devices": "npm run build && node ./bin/cliffside -d devices",
         "keypads": "npm run build && node ./bin/cliffside -d devices",
@@ -35,16 +37,24 @@
         "homebridge": "^1.8.1"
     },
     "devDependencies": {
-        "@mkellsy/baf-client": "^1.2.4",
-        "@mkellsy/hap-device": "^1.2.1",
-        "@mkellsy/leap-client": "^1.2.3",
+        "@eslint/js": "^9.2.0",
+        "@mkellsy/baf-client": "^1.5.3",
+        "@mkellsy/hap-device": "^1.5.3",
+        "@mkellsy/leap-client": "^1.2.5",
         "@types/debug": "^4.1.12",
+        "@types/eslint__js": "^8.42.3",
         "@types/node": "^20.11.0",
+        "@typescript-eslint/eslint-plugin": "^7.11.0",
         "colors": "^1.4.0",
         "commander": "^10.0.1",
         "esbuild": "^0.20.2",
+        "eslint": "^8.57.0",
+        "eslint-plugin-jsdoc": "^48.2.3",
         "js-logger": "^1.6.1",
         "nodemon": "^3.1.0",
+        "prettier": "^3.2.5",
+        "source-map-support": "^0.5.21",
+        "ts-node": "^10.9.1",
         "typescript": "^5.3.3"
     }
 }

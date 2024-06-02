@@ -40,7 +40,7 @@ program.command("devices").action(() => {
                 devices.push(...items);
                 resolve();
             });
-        })
+        }),
     ]).then(() => {
         const types = [
             DeviceType.Contact,
@@ -48,7 +48,7 @@ program.command("devices").action(() => {
             DeviceType.Fan,
             DeviceType.Shade,
             DeviceType.Strip,
-            DeviceType.Switch
+            DeviceType.Switch,
         ];
 
         const controllable = devices
@@ -80,7 +80,7 @@ program.command("keypads").action(() => {
                 devices.push(...items);
                 resolve();
             });
-        })
+        }),
     ]).then(() => {
         const types = [DeviceType.Keypad, DeviceType.Remote];
 
@@ -113,7 +113,7 @@ program.command("buttons").action(() => {
                 devices.push(...items);
                 resolve();
             });
-        })
+        }),
     ]).then(() => {
         const types = [DeviceType.Keypad, DeviceType.Remote];
 

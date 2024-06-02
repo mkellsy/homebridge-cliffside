@@ -7,7 +7,6 @@ import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig 
 import { Accessories } from "./Accessories";
 import { Device } from "./Interfaces/Device";
 import { Lambdas } from "./Lambdas";
-import { System } from "./Interfaces/System";
 
 import { defaults } from "./Interfaces/Config";
 
@@ -34,15 +33,8 @@ export class Platform implements DynamicPlatformPlugin {
         this.homebridge = homebridge;
 
         this.homebridge.on("didFinishLaunching", () => {
-            Leap.connect()
-                .on("Available", (devices) => this.onAvailable(System.leap, devices))
-                .on("Action", (device, button, action) => this.onAction(device, button, action))
-                .on("Update", (device, state) => this.onUpdate(device, state));
-
-            Baf.connect()
-                .on("Available", (devices) => this.onAvailable(System.baf, devices))
-                .on("Update", (device, state) => this.onUpdate(device, state));
-
+            Leap.connect().on("Available", this.onAvailable).on("Action", this.onAction).on("Update", this.onUpdate);
+            Baf.connect().on("Available", this.onAvailable).on("Update", this.onUpdate);
         });
     }
 
@@ -50,9 +42,9 @@ export class Platform implements DynamicPlatformPlugin {
         accessories.set(accessory.UUID, accessory);
     }
 
-    private onAvailable = (system: System, devices: Interfaces.Device[]): void => {
+    private onAvailable = (devices: Interfaces.Device[]): void => {
         for (const device of devices) {
-            const accessory = Accessories.create(system, this.homebridge, device, this.config, this.log);
+            const accessory = Accessories.create(this.homebridge, device, this.config, this.log);
 
             accessory?.register();
 
@@ -64,10 +56,14 @@ export class Platform implements DynamicPlatformPlugin {
         }
     };
 
-    private onAction = (device: Interfaces.Device, button: Interfaces.Button, action: Interfaces.Action): void => {
+    private onAction = async (
+        device: Interfaces.Device,
+        button: Interfaces.Button,
+        action: Interfaces.Action,
+    ): Promise<void> => {
         const accessory = Accessories.get(this.homebridge, device);
 
-        this.lambdas.emit(button, action);
+        await this.lambdas.emit(button, action);
 
         if (accessory == null || accessory.onAction == null) {
             return;

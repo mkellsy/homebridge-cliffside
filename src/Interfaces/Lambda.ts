@@ -7,5 +7,5 @@ export interface Lambda {
         button: Interfaces.Button,
         action: Interfaces.Action,
         devices: Map<string, Interfaces.Device>,
-    ): void;
+    ): PromiseLike<void>;
 }

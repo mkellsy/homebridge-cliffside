@@ -14,7 +14,7 @@ const CONTROLLABLE_TYPES = [
     Interfaces.DeviceType.Keypad,
     Interfaces.DeviceType.Shade,
     Interfaces.DeviceType.Strip,
-    Interfaces.DeviceType.Switch
+    Interfaces.DeviceType.Switch,
 ];
 
 export class Lambdas {
@@ -54,8 +54,8 @@ export class Lambdas {
         }
     }
 
-    public emit(button: Interfaces.Button, action: Interfaces.Action): void {
-        this.lambdas.get(button.id)?.action(button, action, this.devices);
+    public async emit(button: Interfaces.Button, action: Interfaces.Action): Promise<void> {
+        await this.lambdas.get(button.id)?.action(button, action, this.devices);
     }
 
     public has(button: string): boolean {

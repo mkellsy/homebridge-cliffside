@@ -7,12 +7,12 @@ export const defaults = {
         remotes: true,
         shades: false,
         strips: false,
-        switches: false
+        switches: false,
     },
     baf: {
         dimmers: true,
         fans: true,
         sensors: true,
-        switches: true
-    }
+        switches: true,
+    },
 };

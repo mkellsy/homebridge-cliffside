@@ -1,7 +1,9 @@
 # Homebridge Cliffside
+
 This is a highly customized plugin for a single location. This requires [Homebridge](https://homebridge.io/) to run.
 
 ## CLI
+
 **Pairing a processor**
 
 ```
@@ -39,6 +41,7 @@ cliffside buttons
 This will print all button names and IDs. These are the IDs that will be used in lambdas, for the `button` field.
 
 ## Configuration
+
 This plugin doesn't require any configuration other than the platform to work. The default is to expose remotes, keypads, and sensors for LEAP connections, and fans, and lights for Big Ass Fan connections.
 
 ```json
@@ -82,6 +85,7 @@ You can turn on other devices too. These devices are not turned on because they 
 ```
 
 ## Lambdas
+
 This plugin allows writing lambda functions that can be assigned to buttons. That follow this pattern.
 
 ```
@@ -99,4 +103,5 @@ Lambdas need to be stored in a folder at the same level as `.homebridge`. The fo
 [Example Lambdas](https://github.com/mkellsy/cliffside-lambdas/tree/main/src)
 
 ## Support
+
 I offer not support for this plugin, it is published only for personal use.

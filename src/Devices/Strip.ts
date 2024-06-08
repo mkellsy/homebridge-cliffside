@@ -89,7 +89,7 @@ export class Strip extends Common<any> implements Device {
         const base = Math.min(Math.max(value, source[0]), source[1]) - source[0];
         const percentage = (base * 100) / (source[1] - source[0]);
 
-        const delta = (((negate ? 100 : 0) - percentage) * 360) / 100;
+        const delta = (((negate ? 100 : 0) - percentage) * (destination[1] - destination[0])) / 100;
         const result = Math.floor(delta + destination[0]);
 
         return Math.min(Math.max(result, destination[0]), destination[1]);

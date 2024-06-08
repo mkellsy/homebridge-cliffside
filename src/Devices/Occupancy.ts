@@ -1,15 +1,25 @@
-import { API, CharacteristicValue, Logging, PlatformConfig, Service } from "homebridge";
-import { DeviceState, Occupancy as IOccupancy } from "@mkellsy/hap-device";
+import * as Baf from "@mkellsy/baf-client";
+
+import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
-import { System } from "../Interfaces/System";
 
-export class Occupancy extends Common implements Device {
+/**
+ * Creates an occupancy sensor device.
+ */
+export class Occupancy extends Common<Baf.Occupancy> implements Device {
     private service: Service;
 
-    constructor(system: System, homebridge: API, device: IOccupancy, config: PlatformConfig, log: Logging) {
-        super(system, homebridge, device, config, log);
+    /**
+     * Creates an occupancy sensor device.
+     *
+     * @param homebridge A reference to the Homebridge API.
+     * @param device A reference to the discovered device.
+     * @param log A refrence to the Homebridge logger.
+     */
+    constructor(homebridge: API, device: Baf.Occupancy, log: Logging) {
+        super(homebridge, device, log);
 
         this.service =
             this.accessory.getService(this.homebridge.hap.Service.OccupancySensor) ||
@@ -19,7 +29,12 @@ export class Occupancy extends Common implements Device {
         this.service.getCharacteristic(this.homebridge.hap.Characteristic.OccupancyDetected).onGet(this.onGetState);
     }
 
-    public onUpdate(state: DeviceState): void {
+    /**
+     * Updates Homebridge accessory when an update comes from the device.
+     *
+     * @param state The current occupancy sensor state.
+     */
+    public onUpdate(state: Baf.OccupancyState): void {
         this.log.debug(
             `Occupancy: ${this.device.name} State: ${state.state === "Occupied" ? "Detected" : "Not Detected"}`,
         );
@@ -30,6 +45,11 @@ export class Occupancy extends Common implements Device {
         );
     }
 
+    /**
+     * Fetches the current state when Homebridge asks for it.
+     *
+     * @returns A characteristic value.
+     */
     private onGetState = (): CharacteristicValue => {
         this.log.debug(`Occupancy Get State: ${this.device.name} ${this.device.status.state}`);
 

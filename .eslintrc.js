@@ -27,5 +27,23 @@ module.exports = {
                 "@typescript-eslint/no-var-requires": 0,
             },
         },
+        {
+            files: ["./src/Devices/Keypad.ts"],
+            rules: {
+                "@typescript-eslint/no-explicit-any": 0,
+            },
+        },
+        {
+            files: ["./src/Devices/Strip.ts"],
+            rules: {
+                "@typescript-eslint/no-explicit-any": 0,
+            },
+        },
+        {
+            files: ["./src/Devices/Timeclock.ts"],
+            rules: {
+                "@typescript-eslint/no-explicit-any": 0,
+            },
+        },
     ],
 };

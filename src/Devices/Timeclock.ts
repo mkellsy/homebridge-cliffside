@@ -1,15 +1,14 @@
-import { API, CharacteristicValue, Logging, PlatformConfig, Service } from "homebridge";
+import { API, CharacteristicValue, Logging, Service } from "homebridge";
 import { DeviceState, Timeclock as ITimeclock } from "@mkellsy/hap-device";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
-import { System } from "../Interfaces/System";
 
-export class Timeclock extends Common implements Device {
+export class Timeclock extends Common<any> implements Device {
     private service: Service;
 
-    constructor(system: System, homebridge: API, device: ITimeclock, config: PlatformConfig, log: Logging) {
-        super(system, homebridge, device, config, log);
+    constructor(homebridge: API, device: ITimeclock, log: Logging) {
+        super(homebridge, device, log);
 
         const name = `${this.device.name} (Timeclock)`;
 

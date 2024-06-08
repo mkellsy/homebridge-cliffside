@@ -8,8 +8,6 @@ import { Accessories } from "./Accessories";
 import { Device } from "./Interfaces/Device";
 import { Lambdas } from "./Lambdas";
 
-import { defaults } from "./Interfaces/Config";
-
 const accessories: Map<string, PlatformAccessory> = new Map();
 const devices: Map<string, Device> = new Map();
 
@@ -22,14 +20,12 @@ export class Platform implements DynamicPlatformPlugin {
     private readonly lambdas: Lambdas;
 
     private readonly log: Logging;
-    private readonly config: PlatformConfig;
     private readonly homebridge: API;
 
-    constructor(log: Logging, config: PlatformConfig, homebridge: API) {
+    constructor(log: Logging, _config: PlatformConfig, homebridge: API) {
         this.lambdas = new Lambdas(log);
 
         this.log = log;
-        this.config = { ...defaults, ...config };
         this.homebridge = homebridge;
 
         this.homebridge.on("didFinishLaunching", () => {
@@ -44,7 +40,7 @@ export class Platform implements DynamicPlatformPlugin {
 
     private onAvailable = (devices: Interfaces.Device[]): void => {
         for (const device of devices) {
-            const accessory = Accessories.create(this.homebridge, device, this.config, this.log);
+            const accessory = Accessories.create(this.homebridge, device, this.log);
 
             accessory?.register();
 

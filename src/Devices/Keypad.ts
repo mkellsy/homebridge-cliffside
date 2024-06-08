@@ -1,15 +1,14 @@
-import { API, Logging, PlatformConfig, Service } from "homebridge";
+import { API, Logging, Service } from "homebridge";
 import { Action, Button, Keypad as IKeypad } from "@mkellsy/hap-device";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
-import { System } from "../Interfaces/System";
 
-export class Keypad extends Common implements Device {
+export class Keypad extends Common<any> implements Device {
     private services: Map<string, Service> = new Map();
 
-    constructor(system: System, homebridge: API, device: IKeypad, config: PlatformConfig, log: Logging) {
-        super(system, homebridge, device, config, log);
+    constructor(homebridge: API, device: IKeypad, log: Logging) {
+        super(homebridge, device, log);
 
         const labelService =
             this.accessory.getService(this.homebridge.hap.Service.ServiceLabel) ||

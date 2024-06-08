@@ -1,23 +1,30 @@
-import { API, Logging, PlatformAccessory, PlatformConfig } from "homebridge";
+import { API, Logging, PlatformAccessory } from "homebridge";
 import { Device } from "@mkellsy/hap-device";
 
 import { accessories, devices, platform, plugin } from "../Platform";
-import { System } from "../Interfaces/System";
 
-export abstract class Common {
+/**
+ * Defines common functionallity for a device.
+ */
+export abstract class Common<DEVICE extends Device> {
     public readonly id: string;
     public readonly accessory: PlatformAccessory;
 
     protected readonly log: Logging;
     protected readonly homebridge: API;
-    protected readonly device: Device;
-    protected readonly config: PlatformConfig;
+    protected readonly device: DEVICE;
 
-    constructor(system: System, homebridge: API, device: Device, config: PlatformConfig, log: Logging) {
+    /**
+     * Creates a common device.
+     *
+     * @param homebridge A reference to the Homebridge API.
+     * @param device A reference to the discovered device.
+     * @param log A refrence to the Homebridge logger.
+     */
+    constructor(homebridge: API, device: DEVICE, log: Logging) {
         this.log = log;
         this.homebridge = homebridge;
         this.device = device;
-        this.config = config[system];
 
         this.id = this.homebridge.hap.uuid.generate(this.device.id);
         this.accessory = accessories.get(this.id) || new this.homebridge.platformAccessory(device.name, this.id);
@@ -29,6 +36,10 @@ export abstract class Common {
             .setCharacteristic(this.homebridge.hap.Characteristic.SerialNumber, this.device.id);
     }
 
+    /**
+     * Registers a device and if not cached, it will also inform Homebridge
+     * about the device.
+     */
     public register(): void {
         devices.set(this.id, this);
 

@@ -1,15 +1,14 @@
-import { API, CharacteristicValue, Logging, PlatformConfig, Service } from "homebridge";
-import { DeviceState, Strip as IStrip } from "@mkellsy/hap-device";
+import { API, CharacteristicValue, Logging, Service } from "homebridge";
+import { Strip as IStrip } from "@mkellsy/hap-device";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
-import { System } from "../Interfaces/System";
 
-export class Strip extends Common implements Device {
+export class Strip extends Common<any> implements Device {
     private service: Service;
 
-    constructor(system: System, homebridge: API, device: IStrip, config: PlatformConfig, log: Logging) {
-        super(system, homebridge, device, config, log);
+    constructor(homebridge: API, device: IStrip, log: Logging) {
+        super(homebridge, device, log);
 
         this.service =
             this.accessory.getService(this.homebridge.hap.Service.Lightbulb) ||
@@ -29,7 +28,7 @@ export class Strip extends Common implements Device {
             .onSet(this.onSetTemperature);
     }
 
-    public onUpdate(state: DeviceState): void {
+    public onUpdate(state: any): void {
         const luminance = Math.max(state.luminance || 1800, 1800);
         const temperature = Math.floor(((luminance - 1800) / 1200) * 360 + 140);
 

@@ -66,6 +66,9 @@ export class Platform implements DynamicPlatformPlugin {
         const linked = discovered.get(links.get(device.id) || "");
 
         if (linked != null) {
+            this.log.debug(`found linked device ${device.name} <-> ${linked.name}`);
+            this.log.debug(`setting ${linked.name} to ${JSON.stringify({ ...linked.status, ...state }, null, 4)}`);
+
             linked.set({ ...linked.status, ...state });
         }
 

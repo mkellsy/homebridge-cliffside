@@ -6,9 +6,11 @@ import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig 
 
 import { Accessories } from "./Accessories";
 import { Device } from "./Interfaces/Device";
-import { Lambdas } from "./Lambdas";
+
+import { links } from "./Links";
 
 const accessories: Map<string, PlatformAccessory> = new Map();
+const discovered: Map<string, Interfaces.Device> = new Map();
 const devices: Map<string, Device> = new Map();
 
 const platform: string = "Cliffside";
@@ -17,14 +19,10 @@ const plugin: string = "@mkellsy/homebridge-cliffside";
 export { accessories, devices, platform, plugin };
 
 export class Platform implements DynamicPlatformPlugin {
-    private readonly lambdas: Lambdas;
-
     private readonly log: Logging;
     private readonly homebridge: API;
 
     constructor(log: Logging, _config: PlatformConfig, homebridge: API) {
-        this.lambdas = new Lambdas(log);
-
         this.log = log;
         this.homebridge = homebridge;
 
@@ -42,6 +40,7 @@ export class Platform implements DynamicPlatformPlugin {
         for (const device of devices) {
             const accessory = Accessories.create(this.homebridge, device, this.log);
 
+            discovered.set(device.id, device);
             accessory?.register();
 
             this.log.debug(`${device.type} available ${device.name}`);
@@ -49,19 +48,11 @@ export class Platform implements DynamicPlatformPlugin {
             if (accessory == null) {
                 Accessories.remove(this.homebridge, device);
             }
-
-            this.lambdas.set(device);
         }
     };
 
-    private onAction = async (
-        device: Interfaces.Device,
-        button: Interfaces.Button,
-        action: Interfaces.Action,
-    ): Promise<void> => {
+    private onAction = (device: Interfaces.Device, button: Interfaces.Button, action: Interfaces.Action): void => {
         const accessory = Accessories.get(this.homebridge, device);
-
-        await this.lambdas.action(button, action);
 
         if (accessory == null || accessory.onAction == null) {
             return;
@@ -70,10 +61,13 @@ export class Platform implements DynamicPlatformPlugin {
         accessory.onAction(button, action);
     };
 
-    private onUpdate = async (device: Interfaces.Device, state: Interfaces.DeviceState): Promise<void> => {
+    private onUpdate = (device: Interfaces.Device, state: Interfaces.DeviceState): void => {
         const accessory = Accessories.get(this.homebridge, device);
+        const linked = discovered.get(links.get(device.id) || "");
 
-        await this.lambdas.update(device, state);
+        if (linked != null) {
+            linked.set(state);
+        }
 
         if (accessory == null || accessory.onUpdate == null) {
             return;

@@ -66,7 +66,7 @@ export class Platform implements DynamicPlatformPlugin {
         const linked = discovered.get(links.get(device.id) || "");
 
         if (linked != null) {
-            linked.set(state);
+            linked.set({ ...linked.status, ...state });
         }
 
         if (accessory == null || accessory.onUpdate == null) {

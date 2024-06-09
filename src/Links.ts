@@ -1,8 +1,9 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 
 const links = new Map<string, string>();
-const filename = path.resolve(__dirname, "../links.json");
+const filename = path.join(os.homedir(), ".leap/links.json");
 
 if (fs.existsSync(filename)) {
     try {

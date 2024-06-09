@@ -6,8 +6,9 @@ import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig 
 
 import { Accessories } from "./Accessories";
 import { Device } from "./Interfaces/Device";
+import { LinkType } from "./Interfaces/LinkType";
 
-import { links } from "./Links";
+import { getLinkType, links } from "./Links";
 
 const accessories: Map<string, PlatformAccessory> = new Map();
 const discovered: Map<string, Interfaces.Device> = new Map();
@@ -61,21 +62,40 @@ export class Platform implements DynamicPlatformPlugin {
         accessory.onAction(button, action);
     };
 
-    private onUpdate = (device: Interfaces.Device, state: Interfaces.DeviceState): void => {
+    private onUpdate = (device: Interfaces.Device, status: Interfaces.DeviceState): void => {
         const accessory = Accessories.get(this.homebridge, device);
         const linked = discovered.get(links.get(device.id) || "");
 
-        if (linked != null) {
-            this.log.debug(`found linked device ${device.name} <-> ${linked.name}`);
-            this.log.debug(`setting ${linked.name} to ${JSON.stringify({ ...linked.status, ...state }, null, 4)}`);
+        let state: "On" | "Off";
+        let level: number;
+        let speed: number;
 
-            linked.set({ ...linked.status, ...state });
+        if (linked != null) {
+            switch (getLinkType(device, linked)) {
+                case LinkType.Equal:
+                    linked.set({ ...linked.status, ...status });
+                    break;
+
+                case LinkType.DimmerToFan:
+                    speed = Math.round(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
+                    state = speed > 0 ? "On" : "Off";
+
+                    (linked as Baf.Fan).set({ ...(linked.status as Baf.FanState), state, speed });
+                    break;
+
+                case LinkType.FanToDimmer:
+                    level = Math.round(((status as Baf.FanState).speed / 7) * 100);
+                    state = level > 0 ? "On" : "Off";
+
+                    (linked as Leap.Dimmer).set({ ...(linked.status as Leap.DimmerState), state, level });
+                    break;
+            }
         }
 
         if (accessory == null || accessory.onUpdate == null) {
             return;
         }
 
-        accessory.onUpdate(state);
+        accessory.onUpdate(status);
     };
 }

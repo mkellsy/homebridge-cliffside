@@ -1,13 +1,14 @@
+import * as Leap from "@mkellsy/leap-client";
+
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
-import { Strip as IStrip } from "@mkellsy/hap-device";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
 
-export class Strip extends Common<any> implements Device {
+export class Strip extends Common<Leap.Strip> implements Device {
     private service: Service;
 
-    constructor(homebridge: API, device: IStrip, log: Logging) {
+    constructor(homebridge: API, device: Leap.Strip, log: Logging) {
         super(homebridge, device, log);
 
         this.service =
@@ -32,7 +33,7 @@ export class Strip extends Common<any> implements Device {
             .onSet(this.onSetTemperature);
     }
 
-    public onUpdate(state: any): void {
+    public onUpdate(state: Leap.StripState): void {
         const temperature = this.transformRange(state.luminance, [1800, 3000], [140, 500], true);
 
         this.log.debug(`Strip: ${this.device.name} State: ${state.state}`);

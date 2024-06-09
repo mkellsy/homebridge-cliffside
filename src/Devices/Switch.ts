@@ -1,4 +1,4 @@
-import * as Baf from "@mkellsy/baf-client";
+import * as Leap from "@mkellsy/leap-client";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
@@ -8,7 +8,7 @@ import { Device } from "../Interfaces/Device";
 /**
  * Creates a switch device.
  */
-export class Switch extends Common<Baf.Switch> implements Device {
+export class Switch extends Common<Leap.Switch> implements Device {
     private service: Service;
 
     /**
@@ -18,7 +18,7 @@ export class Switch extends Common<Baf.Switch> implements Device {
      * @param device A reference to the discovered device.
      * @param log A refrence to the Homebridge logger.
      */
-    constructor(homebridge: API, device: Baf.Switch, log: Logging) {
+    constructor(homebridge: API, device: Leap.Switch, log: Logging) {
         super(homebridge, device, log);
 
         this.service =
@@ -38,7 +38,7 @@ export class Switch extends Common<Baf.Switch> implements Device {
      *
      * @param state The current switch state.
      */
-    public onUpdate(state: Baf.SwitchState): void {
+    public onUpdate(state: Leap.SwitchState): void {
         this.log.debug(`Switch: ${this.device.name} state: ${state.state}`);
 
         this.service.updateCharacteristic(this.homebridge.hap.Characteristic.On, state.state === "On");

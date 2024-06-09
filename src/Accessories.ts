@@ -1,7 +1,8 @@
 import * as Baf from "@mkellsy/baf-client";
+import * as Leap from "@mkellsy/leap-client";
 
 import { API, Logging } from "homebridge";
-import { DeviceType, Device as IDevice, Keypad as IKeypad } from "@mkellsy/hap-device";
+import { DeviceType, Device as IDevice } from "@mkellsy/hap-device";
 
 import { accessories, devices, platform, plugin } from "./Platform";
 
@@ -28,7 +29,7 @@ export abstract class Accessories {
                     return undefined;
                 }
 
-                return new Dimmer(homebridge, device as Baf.Dimmer, log);
+                return new Dimmer(homebridge, device as Leap.Dimmer, log);
 
             case DeviceType.Fan:
                 if (system !== System.baf) {
@@ -41,29 +42,29 @@ export abstract class Accessories {
                 return new Humidity(homebridge, device as Baf.Humidity, log);
 
             case DeviceType.Keypad:
-                return new Keypad(homebridge, device as IKeypad, log);
+                return new Keypad(homebridge, device as Leap.Keypad, log);
 
             case DeviceType.Occupancy:
-                return new Occupancy(homebridge, device as Baf.Occupancy, log);
+                return new Occupancy(homebridge, device as Leap.Occupancy, log);
 
             case DeviceType.Remote:
-                return new Keypad(homebridge, device as IKeypad, log);
+                return new Keypad(homebridge, device as Leap.Keypad, log);
 
             case DeviceType.Strip:
-                return new Strip(homebridge, device, log);
+                return new Strip(homebridge, device as Leap.Strip, log);
 
             case DeviceType.Switch:
                 if (system !== System.baf) {
                     return undefined;
                 }
 
-                return new Switch(homebridge, device as Baf.Switch, log);
+                return new Switch(homebridge, device as Leap.Switch, log);
 
             case DeviceType.Temperature:
                 return new Temperature(homebridge, device as Baf.Temperature, log);
 
             case DeviceType.Timeclock:
-                return new Timeclock(homebridge, device, log);
+                return new Timeclock(homebridge, device as Leap.Timeclock, log);
         }
 
         return undefined;

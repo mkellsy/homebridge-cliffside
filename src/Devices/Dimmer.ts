@@ -1,4 +1,4 @@
-import * as Baf from "@mkellsy/baf-client";
+import * as Leap from "@mkellsy/leap-client";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
@@ -8,7 +8,7 @@ import { Device } from "../Interfaces/Device";
 /**
  * Creates a dimmer device.
  */
-export class Dimmer extends Common<Baf.Dimmer> implements Device {
+export class Dimmer extends Common<Leap.Dimmer> implements Device {
     private service: Service;
 
     /**
@@ -18,7 +18,7 @@ export class Dimmer extends Common<Baf.Dimmer> implements Device {
      * @param device A reference to the discovered device.
      * @param log A refrence to the Homebridge logger.
      */
-    constructor(homebridge: API, device: Baf.Dimmer, log: Logging) {
+    constructor(homebridge: API, device: Leap.Dimmer, log: Logging) {
         super(homebridge, device, log);
 
         this.service =
@@ -43,7 +43,7 @@ export class Dimmer extends Common<Baf.Dimmer> implements Device {
      *
      * @param state The current dimmer state.
      */
-    public onUpdate(state: Baf.DimmerState): void {
+    public onUpdate(state: Leap.DimmerState): void {
         this.log.debug(`Dimmer: ${this.device.name} State: ${state.state}`);
         this.log.debug(`Dimmer: ${this.device.name} Brightness: ${state.level}`);
 

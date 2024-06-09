@@ -1,4 +1,4 @@
-import * as Baf from "@mkellsy/baf-client";
+import * as Leap from "@mkellsy/leap-client";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
@@ -8,7 +8,7 @@ import { Device } from "../Interfaces/Device";
 /**
  * Creates an occupancy sensor device.
  */
-export class Occupancy extends Common<Baf.Occupancy> implements Device {
+export class Occupancy extends Common<Leap.Occupancy> implements Device {
     private service: Service;
 
     /**
@@ -18,7 +18,7 @@ export class Occupancy extends Common<Baf.Occupancy> implements Device {
      * @param device A reference to the discovered device.
      * @param log A refrence to the Homebridge logger.
      */
-    constructor(homebridge: API, device: Baf.Occupancy, log: Logging) {
+    constructor(homebridge: API, device: Leap.Occupancy, log: Logging) {
         super(homebridge, device, log);
 
         this.service =
@@ -34,7 +34,7 @@ export class Occupancy extends Common<Baf.Occupancy> implements Device {
      *
      * @param state The current occupancy sensor state.
      */
-    public onUpdate(state: Baf.OccupancyState): void {
+    public onUpdate(state: Leap.OccupancyState): void {
         this.log.debug(
             `Occupancy: ${this.device.name} State: ${state.state === "Occupied" ? "Detected" : "Not Detected"}`,
         );

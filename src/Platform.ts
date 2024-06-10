@@ -77,14 +77,22 @@ export class Platform implements DynamicPlatformPlugin {
                     break;
 
                 case LinkType.DimmerToFan:
-                    speed = Math.round(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
+                    speed = (linked.status as Baf.FanState).speed || 0;
+                    level = Math.floor((speed / 7) * 100);
+
+                    if (speed === 0 || (((status as Leap.DimmerState).level as number) || 0) > level) {
+                        speed = Math.ceil(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
+                    } else if ((((status as Leap.DimmerState).level as number) || 0) < level) {
+                        speed = Math.floor(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
+                    }
+
                     state = speed > 0 ? "On" : "Off";
 
                     (linked as Baf.Fan).set({ ...(linked.status as Baf.FanState), state, speed });
                     break;
 
                 case LinkType.FanToDimmer:
-                    level = Math.round(((status as Baf.FanState).speed / 7) * 100);
+                    level = Math.floor(((status as Baf.FanState).speed / 7) * 100);
                     state = level > 0 ? "On" : "Off";
 
                     (linked as Leap.Dimmer).set({ ...(linked.status as Leap.DimmerState), state, level });

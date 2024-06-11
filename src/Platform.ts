@@ -22,6 +22,7 @@ export { accessories, devices, platform, plugin };
 export class Platform implements DynamicPlatformPlugin {
     private readonly log: Logging;
     private readonly homebridge: API;
+    private readonly locks: Set<string> = new Set();
 
     constructor(log: Logging, _config: PlatformConfig, homebridge: API) {
         this.log = log;
@@ -66,38 +67,8 @@ export class Platform implements DynamicPlatformPlugin {
         const accessory = Accessories.get(this.homebridge, device);
         const linked = discovered.get(links.get(device.id) || "");
 
-        let state: "On" | "Off";
-        let level: number;
-        let speed: number;
-
         if (linked != null) {
-            switch (getLinkType(device, linked)) {
-                case LinkType.Equal:
-                    linked.set({ ...linked.status, ...status });
-                    break;
-
-                case LinkType.DimmerToFan:
-                    speed = (linked.status as Baf.FanState).speed || 0;
-                    level = Math.floor((speed / 7) * 100);
-
-                    if (speed === 0 || (((status as Leap.DimmerState).level as number) || 0) > level) {
-                        speed = Math.ceil(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
-                    } else if ((((status as Leap.DimmerState).level as number) || 0) < level) {
-                        speed = Math.floor(((((status as Leap.DimmerState).level as number) || 0) / 100) * 7);
-                    }
-
-                    state = speed > 0 ? "On" : "Off";
-
-                    (linked as Baf.Fan).set({ ...(linked.status as Baf.FanState), state, speed });
-                    break;
-
-                case LinkType.FanToDimmer:
-                    level = Math.floor(((status as Baf.FanState).speed / 7) * 100);
-                    state = level > 0 ? "On" : "Off";
-
-                    (linked as Leap.Dimmer).set({ ...(linked.status as Leap.DimmerState), state, level });
-                    break;
-            }
+            this.syncDevices(device, linked, status);
         }
 
         if (accessory == null || accessory.onUpdate == null) {
@@ -106,4 +77,63 @@ export class Platform implements DynamicPlatformPlugin {
 
         accessory.onUpdate(status);
     };
+
+    private syncDevices(device: Interfaces.Device, linked: Interfaces.Device, status: Interfaces.DeviceState): void {
+        if (this.locks.has(linked.id)) {
+            return;
+        }
+
+        let state: "On" | "Off";
+
+        let level: number;
+        let speed: number;
+
+        switch (getLinkType(device, linked)) {
+            case LinkType.Equal:
+                this.lockDevice(linked);
+
+                linked.set({ ...linked.status, ...status }).catch((error) => this.log.error(error));
+                return;
+
+            case LinkType.DimmerToFan:
+                speed = (linked.status as Baf.FanState).speed;
+                level = Math.floor((speed / 7) * 100);
+
+                if ((status as Leap.DimmerState).level > level) {
+                    speed = Math.ceil(((status as Leap.DimmerState).level / 100) * 7);
+                } else if ((status as Leap.DimmerState).level < level) {
+                    speed = Math.floor(((status as Leap.DimmerState).level / 100) * 7);
+                }
+
+                state = speed > 0 ? "On" : "Off";
+                level = Math.floor((speed / 7) * 100);
+
+                this.lockDevice(linked);
+
+                (linked as Baf.Fan)
+                    .set({ ...(linked.status as Baf.FanState), state, speed })
+                    .catch((error) => this.log.error(error));
+
+                (device as Leap.Dimmer)
+                    .set({ ...(linked.status as Leap.DimmerState), state, level })
+                    .catch((error) => this.log.error(error));
+
+                return;
+
+            case LinkType.FanToDimmer:
+                level = Math.floor(((status as Baf.FanState).speed / 7) * 100);
+                state = level > 0 ? "On" : "Off";
+
+                this.lockDevice(linked);
+
+                (linked as Leap.Dimmer).set({ ...(linked.status as Leap.DimmerState), state, level });
+                return;
+        }
+    }
+
+    private lockDevice(device: Interfaces.Device): void {
+        this.locks.add(device.id);
+
+        setTimeout(() => this.locks.delete(device.id), 1_000);
+    }
 }

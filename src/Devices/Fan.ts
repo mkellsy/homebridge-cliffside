@@ -1,9 +1,11 @@
 import * as Baf from "@mkellsy/baf-client";
+import * as Interfaces from "@mkellsy/hap-device";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";
+import { Dimmer } from "./Dimmer";
 
 /**
  * Creates a fan device.
@@ -85,6 +87,41 @@ export class Fan extends Common<Baf.Fan> implements Device {
 
             this.eco.getCharacteristic(this.homebridge.hap.Characteristic.On).onGet(this.onGetEco).onSet(this.onSetEco);
         }
+    }
+
+    /**
+     * Converts a dimmer level to a fan speed.
+     *
+     * @param level The dimmer brightness level.
+     * @param status The current status of the dimmer.
+     *
+     * @returns The speed value as a number.
+     */
+    public static convertLevel(value: number, status: Interfaces.DeviceState): number {
+        const currentSpeed: number = (status as Baf.FanState).speed;
+        const currentLevel: number = Dimmer.convertSpeed(currentSpeed);
+
+        if (Math.abs(value - currentLevel) > 10) {
+            return Math.round((value / 100) * 7);
+        }
+
+        if (value > currentLevel) {
+            return Math.ceil((value / 100) * 7);
+        }
+
+        return Math.floor((value / 100) * 7);
+    }
+
+    /**
+     * Updates the rotation speed of a fan.
+     *
+     * @param device The device to update.
+     * @param speed The rotation speed.
+     */
+    public static updateSpeed(device: Interfaces.Device, speed: number): Promise<void> {
+        const state = speed > 0 ? "On" : "Off";
+
+        return (device as Baf.Fan).set({ ...(device.status as Baf.FanState), state, speed });
     }
 
     /**

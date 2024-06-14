@@ -1,5 +1,5 @@
 {
-    "version": "1.4.8",
+    "version": "1.4.9",
     "name": "@mkellsy/homebridge-cliffside",
     "displayName": "Homebridge Cliffside",
     "description": "This is a highly customized plugin for a single location.",

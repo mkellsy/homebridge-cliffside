@@ -1,4 +1,5 @@
 import * as Leap from "@mkellsy/leap-client";
+import * as Interfaces from "@mkellsy/hap-device";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
@@ -36,6 +37,29 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
             .getCharacteristic(this.homebridge.hap.Characteristic.Brightness)
             .onGet(this.onGetBrightness)
             .onSet(this.onSetBrightness);
+    }
+
+    /**
+     * Converts a fan speed level to a dimmer level.
+     *
+     * @param level The fan speed.
+     *
+     * @returns The brightness level as a number.
+     */
+    public static convertSpeed(speed: number): number {
+        return Math.round((speed / 7) * 100);
+    }
+
+    /**
+     * Updates the brightness level of a dimmer.
+     *
+     * @param device The device to update.
+     * @param level The brightness level.
+     */
+    public static updateLevel(device: Interfaces.Device, level: number): Promise<void> {
+        const state = level > 0 ? "On" : "Off";
+
+        return (device as Leap.Dimmer).set({ ...device.status, state, level });
     }
 
     /**

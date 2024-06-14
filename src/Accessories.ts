@@ -6,13 +6,11 @@ import { DeviceType, Device as IDevice } from "@mkellsy/hap-device";
 
 import { accessories, devices, platform, plugin } from "./Platform";
 
-import { Dimmer } from "./Devices/Dimmer";
 import { Fan } from "./Devices/Fan";
 import { Humidity } from "./Devices/Humidity";
 import { Keypad } from "./Devices/Keypad";
 import { Occupancy } from "./Devices/Occupancy";
 import { Strip } from "./Devices/Strip";
-import { Switch } from "./Devices/Switch";
 import { Temperature } from "./Devices/Temperature";
 import { Timeclock } from "./Devices/Timeclock";
 
@@ -24,13 +22,6 @@ export abstract class Accessories {
         const system: System = parseSystem(device);
 
         switch (device.type) {
-            case DeviceType.Dimmer:
-                if (system !== System.baf) {
-                    return undefined;
-                }
-
-                return new Dimmer(homebridge, device as Leap.Dimmer, log);
-
             case DeviceType.Fan:
                 if (system !== System.baf) {
                     return undefined;
@@ -52,13 +43,6 @@ export abstract class Accessories {
 
             case DeviceType.Strip:
                 return new Strip(homebridge, device as Leap.Strip, log);
-
-            case DeviceType.Switch:
-                if (system !== System.baf) {
-                    return undefined;
-                }
-
-                return new Switch(homebridge, device as Leap.Switch, log);
 
             case DeviceType.Temperature:
                 return new Temperature(homebridge, device as Baf.Temperature, log);

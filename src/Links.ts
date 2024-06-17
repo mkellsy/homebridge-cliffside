@@ -87,7 +87,10 @@ export class Links {
                     this.log.debug(`Oposing dimmer ${opposing.id}`);
 
                     await Dimmer.updateLevel(opposing, 0);
-                    await Dimmer.updateLevel(linked, level);
+
+                    setTimeout(async () => {
+                        await Dimmer.updateLevel(linked, level);
+                    }, 250);
                 } else {
                     await Dimmer.updateLevel(linked, level);
                 }

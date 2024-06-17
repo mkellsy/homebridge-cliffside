@@ -1,4 +1,3 @@
-import * as Baf from "@mkellsy/baf-client";
 import * as Leap from "@mkellsy/leap-client";
 import * as Interfaces from "@mkellsy/hap-device";
 
@@ -22,7 +21,6 @@ export class Links {
     private readonly filename = path.join(os.homedir(), ".leap/links.json");
 
     private readonly devices: Map<string, Interfaces.Device> = new Map();
-    private readonly locks: Set<string> = new Set();
 
     constructor(log: Logging) {
         this.log = log;
@@ -33,7 +31,6 @@ export class Links {
 
             for (const value of values) {
                 this.links.set(value[0], value[1]);
-                this.links.set(value[1], value[0]);
             }
         } catch (error) {
             /* no-op */
@@ -59,20 +56,11 @@ export class Links {
     public update(device: Interfaces.Device, status: Interfaces.DeviceState): void {
         const linked = this.devices.get(this.links.get(device.id) || "");
 
-        if (linked == null || this.locks.has(linked.id)) {
+        if (linked == null) {
             return;
         }
 
         this.syncDevices(device, linked, status);
-    }
-
-    /*
-     * Locks a device from the next update.
-     */
-    private lockDevice(device: Interfaces.Device): void {
-        this.locks.add(device.id);
-
-        setTimeout(() => this.locks.delete(device.id), 1_000);
     }
 
     /*
@@ -82,30 +70,51 @@ export class Links {
         let level: number;
         let speed: number;
 
-        switch (parseLinkType(device, linked)) {
-            case LinkType.Equal:
-                this.lockDevice(linked);
+        let opposing: Interfaces.Device | undefined;
 
-                linked.set({ ...linked.status, ...status }).catch((error) => this.log.error(error));
+        switch (parseLinkType(device, linked)) {
+            case LinkType.DimmerToDimmer:
+                level = (status as Leap.DimmerState).level;
+                opposing = this.getOpposing(linked);
+
+                if (opposing != null) {
+                    Dimmer.updateLevel(opposing, 0).catch((error: Error) => this.log.error(error.message));
+                }
+
+                Dimmer.updateLevel(linked, level).catch((error: Error) => this.log.error(error.message));
                 return;
 
             case LinkType.DimmerToFan:
-                this.lockDevice(linked);
-
                 speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
                 level = Dimmer.convertSpeed(speed);
 
-                Fan.updateSpeed(linked, speed).catch((error) => this.log.error(error));
-                Dimmer.updateLevel(device, level).catch((error) => this.log.error(error));
-                return;
-
-            case LinkType.FanToDimmer:
-                this.lockDevice(linked);
-
-                level = Dimmer.convertSpeed((status as Baf.FanState).speed);
-
-                Dimmer.updateLevel(linked, level).catch((error) => this.log.error(error));
+                Fan.updateSpeed(device, linked, speed).catch((error: Error) => this.log.error(error.message));
                 return;
         }
+    }
+
+    /*
+     * BAF has two opposing lights, where one turns off when the other turns on.
+     */
+    private getOpposing(device: Interfaces.Device): Interfaces.Device | undefined {
+        if (device.id.includes("DOWNLIGHT")) {
+            return this.getControl(device.id.replace("DOWNLIGHT", "UPLIGHT"));
+        }
+        
+        if (device.id.includes("UPLIGHT")) {
+            return this.getControl(device.id.replace("UPLIGHT", "DOWNLIGHT"));
+        }
+
+        return undefined;
+    }
+
+    /*
+     * Fetches the control device from a linked device.
+     */
+    private getControl(linked: string): Interfaces.Device | undefined {
+        const links = Array.from(this.links.entries());
+        const filtered = links.find(([, value]) => value === linked);
+
+        return filtered != null ? this.devices.get(filtered[0]) : undefined;
     }
 }

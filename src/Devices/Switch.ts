@@ -64,7 +64,7 @@ export class Switch extends Common<Leap.Switch> implements Device {
         if (this.device.status.state !== state) {
             this.log.debug(`Switch Set State: ${this.device.name} ${state}`);
 
-            this.device.set({ state }).catch((error) => this.log.error(error));
+            this.device.set({ state }).catch((error: Error) => this.log.error(error.message));
         }
     };
 }

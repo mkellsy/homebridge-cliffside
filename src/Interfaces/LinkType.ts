@@ -5,26 +5,20 @@ import { Device, DeviceType } from "@mkellsy/hap-device";
  */
 export enum LinkType {
     /**
-     * Both devices are equal and can be synced directly.
+     * The device types are not compatible.
      */
-    Equal,
+    Incompatible,
+
+    /**
+     * Both devices are dimmers.
+     */
+    DimmerToDimmer,
 
     /**
      * The source is a dimmer and brightness needs to be translated to a fan
      * speed value.
      */
     DimmerToFan,
-
-    /**
-     * The source is a fan and the fan speed needs to be translated to a
-     * brightness value.
-     */
-    FanToDimmer,
-
-    /**
-     * The device types are not compatible.
-     */
-    Incompatible,
 }
 
 /**
@@ -44,22 +38,10 @@ export function parseLinkType(source: Device, destination: Device): LinkType {
         case DeviceType.Dimmer:
             switch (destination.type) {
                 case DeviceType.Dimmer:
-                    return LinkType.Equal;
+                    return LinkType.DimmerToDimmer;
 
                 case DeviceType.Fan:
                     return LinkType.DimmerToFan;
-
-                default:
-                    return LinkType.Incompatible;
-            }
-
-        case DeviceType.Fan:
-            switch (destination.type) {
-                case DeviceType.Dimmer:
-                    return LinkType.FanToDimmer;
-
-                case DeviceType.Fan:
-                    return LinkType.Equal;
 
                 default:
                     return LinkType.Incompatible;

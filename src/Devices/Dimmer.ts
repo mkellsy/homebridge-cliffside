@@ -55,11 +55,20 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
      *
      * @param device The device to update.
      * @param level The brightness level.
+     * @param toggled (Optional) The device that is oppiside the dimmer. For
+     *                BAF uplight and downlights can only be controled one at a
+     *                time, and only one can be on. While the app can sync the
+     *                two lights, only one can be controled.
      */
     public static updateLevel(device: Interfaces.Device, level: number): Promise<void> {
-        const state = level > 0 ? "On" : "Off";
+        return new Promise((resolve, reject) => {
+            const state = level > 0 ? "On" : "Off";
 
-        return (device as Leap.Dimmer).set({ ...device.status, state, level });
+            (device as Leap.Dimmer)
+                .set({ ...device.status, state, level })
+                .then(() => resolve())
+                .catch((error: Error) => reject(error));
+        });
     }
 
     /**
@@ -97,7 +106,7 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
             this.log.debug(`Dimmer Set State: ${this.device.name} ${state}`);
             this.log.debug(`Dimmer Set Brightness: ${this.device.name} ${level}`);
 
-            this.device.set({ state, level }).catch((error) => this.log.error(error));
+            this.device.set({ state, level }).catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -123,7 +132,7 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
             this.log.debug(`Dimmer Set State: ${this.device.name} ${state}`);
             this.log.debug(`Dimmer Set Brightness: ${this.device.name} ${level}`);
 
-            this.device.set({ state, level }).catch((error) => this.log.error(error));
+            this.device.set({ state, level }).catch((error: Error) => this.log.error(error.message));
         }
     };
 }

@@ -115,13 +115,24 @@ export class Fan extends Common<Baf.Fan> implements Device {
     /**
      * Updates the rotation speed of a fan.
      *
+     * @param dimmer The dimmer that caused the update.
      * @param device The device to update.
      * @param speed The rotation speed.
      */
-    public static updateSpeed(device: Interfaces.Device, speed: number): Promise<void> {
-        const state = speed > 0 ? "On" : "Off";
+    public static updateSpeed(dimmer: Interfaces.Device, device: Interfaces.Device, speed: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const state = speed > 0 ? "On" : "Off";
+            const level = Dimmer.convertSpeed(speed);
 
-        return (device as Baf.Fan).set({ ...(device.status as Baf.FanState), state, speed });
+            Dimmer.updateLevel(dimmer, level)
+                .then(() => {
+                    (device as Baf.Fan)
+                        .set({ ...(device.status as Baf.FanState), state, speed })
+                        .then(() => resolve())
+                        .catch((error: Error) => reject(error));
+                })
+                .catch((error: Error) => reject(error));
+        });
     }
 
     /**
@@ -190,7 +201,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
                     whoosh: this.device.status.whoosh,
                     eco: this.device.status.eco || "Off",
                 })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -225,7 +236,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
                     whoosh: this.device.status.whoosh,
                     eco: this.device.status.eco || "Off",
                 })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -256,7 +267,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
                     whoosh: this.device.status.whoosh,
                     eco: this.device.status.eco || "Off",
                 })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -287,7 +298,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
                     whoosh,
                     eco: this.device.status.eco || "Off",
                 })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -318,7 +329,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
                     whoosh: this.device.status.whoosh,
                     eco,
                 })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 }

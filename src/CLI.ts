@@ -19,7 +19,7 @@ program.command("pair").action(() => {
 
     Leap.pair()
         .then(() => log.info("Processor paired"))
-        .catch((error) => log.error(Colors.red(error.message)))
+        .catch((error: Error) => log.error(Colors.red(error.message)))
         .finally(() => process.exit(0));
 });
 

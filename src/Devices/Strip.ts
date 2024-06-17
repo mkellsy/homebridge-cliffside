@@ -62,7 +62,7 @@ export class Strip extends Common<Leap.Strip> implements Device {
 
             this.device
                 .set({ state, level, luminance: this.device.status.luminance })
-                .catch((error) => this.log.error(error));
+                .catch((error: Error) => this.log.error(error.message));
         }
     };
 
@@ -80,7 +80,7 @@ export class Strip extends Common<Leap.Strip> implements Device {
 
         this.device
             .set({ state, level, luminance: this.device.status.luminance })
-            .catch((error) => this.log.error(error));
+            .catch((error: Error) => this.log.error(error.message));
     };
 
     private onGetTemperature = (): CharacteristicValue => {
@@ -104,7 +104,7 @@ export class Strip extends Common<Leap.Strip> implements Device {
                 level: this.device.status.level || 0,
                 luminance,
             })
-            .catch((error) => this.log.error(error));
+            .catch((error: Error) => this.log.error(error.message));
     };
 
     private transformRange(value: number, source: number[], destination: number[], negate: boolean) {

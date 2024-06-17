@@ -66,65 +66,54 @@ export class Links {
     /*
      * Executes the desired action on the linked device
      */
-    private syncDevices(
+    private async syncDevices(
         device: Interfaces.Device,
         linked: Interfaces.Device,
         status: Interfaces.DeviceState,
     ): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let level: number;
-            let speed: number;
+        let level: number;
+        let speed: number;
 
-            let opposing: Interfaces.Device | undefined;
+        let opposing: Interfaces.Device | undefined;
 
-            switch (parseLinkType(device, linked)) {
-                case LinkType.DimmerToDimmer:
-                    level = (status as Leap.DimmerState).level;
-                    opposing = this.getOpposing(linked);
+        switch (parseLinkType(device, linked)) {
+            case LinkType.DimmerToDimmer:
+                level = (status as Leap.DimmerState).level;
+                opposing = this.getOpposing(linked);
 
-                    if (opposing != null && opposing.status.state === "On") {
-                        Dimmer.updateLevel(opposing, 0)
-                            .then(() => {
-                                setTimeout(() => {
-                                    Dimmer.updateLevel(linked, level)
-                                        .then(() => resolve())
-                                        .catch((error: Error) => reject(error));
-                                }, 100);
-                            })
-                            .catch((error: Error) => reject(error));
-                    } else {
-                        Dimmer.updateLevel(linked, level)
-                            .then(() => resolve())
-                            .catch((error: Error) => reject(error));
-                    }
+                this.log.debug(`Linked dimmer ${linked.id}`);
 
-                    break;
+                if (opposing != null && opposing.status.state === "On" && level > 0) {
+                    this.log.debug(`Oposing dimmer ${opposing.id}`);
 
-                case LinkType.DimmerToFan:
-                    speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
-                    level = Dimmer.convertSpeed(speed);
+                    await Dimmer.updateLevel(opposing, 0);
+                    await Dimmer.updateLevel(linked, level);
+                } else {
+                    await Dimmer.updateLevel(linked, level);
+                }
 
-                    Fan.updateSpeed(device, linked, speed)
-                        .then(() => resolve())
-                        .catch((error: Error) => error);
-                    break;
+                break;
 
-                default:
-                    resolve();
-                    break;
-            }
-        });
+            case LinkType.DimmerToFan:
+                speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
+                level = Dimmer.convertSpeed(speed);
+
+                this.log.debug(`Linked fan ${linked.id}`);
+
+                await Fan.updateSpeed(device, linked, speed);
+                break;
+        }
     }
 
     /*
      * BAF has two opposing lights, where one turns off when the other turns on.
      */
     private getOpposing(device: Interfaces.Device): Interfaces.Device | undefined {
-        if (device.id.includes("DOWNLIGHT")) {
+        if (device.id.indexOf("DOWNLIGHT") >= 0) {
             return this.getControl(device.id.replace("DOWNLIGHT", "UPLIGHT"));
         }
 
-        if (device.id.includes("UPLIGHT")) {
+        if (device.id.indexOf("UPLIGHT") >= 0) {
             return this.getControl(device.id.replace("UPLIGHT", "DOWNLIGHT"));
         }
 
@@ -134,10 +123,13 @@ export class Links {
     /*
      * Fetches the control device from a linked device.
      */
-    private getControl(linked: string): Interfaces.Device | undefined {
-        const links = Array.from(this.links.entries());
-        const filtered = links.find(([, value]) => value === linked);
+    private getControl(id: string): Interfaces.Device | undefined {
+        for (const [key, value] of this.links.entries()) {
+            if (value === id) {
+                return this.devices.get(key);
+            }
+        }
 
-        return filtered != null ? this.devices.get(filtered[0]) : undefined;
+        return undefined;
     }
 }

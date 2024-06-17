@@ -60,37 +60,58 @@ export class Links {
             return;
         }
 
-        this.syncDevices(device, linked, status);
+        this.syncDevices(device, linked, status).catch((error: Error) => this.log.error(error.message));
     }
 
     /*
      * Executes the desired action on the linked device
      */
-    private syncDevices(device: Interfaces.Device, linked: Interfaces.Device, status: Interfaces.DeviceState): void {
-        let level: number;
-        let speed: number;
+    private syncDevices(
+        device: Interfaces.Device,
+        linked: Interfaces.Device,
+        status: Interfaces.DeviceState,
+    ): Promise<void> {
+        return new Promise((resolve, reject) => {
+            let level: number;
+            let speed: number;
 
-        let opposing: Interfaces.Device | undefined;
+            let opposing: Interfaces.Device | undefined;
 
-        switch (parseLinkType(device, linked)) {
-            case LinkType.DimmerToDimmer:
-                level = (status as Leap.DimmerState).level;
-                opposing = this.getOpposing(linked);
+            switch (parseLinkType(device, linked)) {
+                case LinkType.DimmerToDimmer:
+                    level = (status as Leap.DimmerState).level;
+                    opposing = this.getOpposing(linked);
 
-                if (opposing != null) {
-                    Dimmer.updateLevel(opposing, 0).catch((error: Error) => this.log.error(error.message));
-                }
+                    if (opposing != null) {
+                        Dimmer.updateLevel(opposing, 0)
+                            .then(() => {
+                                Dimmer.updateLevel(linked, level)
+                                    .then(() => resolve())
+                                    .catch((error: Error) => reject(error));
+                            })
+                            .catch((error: Error) => reject(error));
+                    } else {
+                        Dimmer.updateLevel(linked, level)
+                            .then(() => resolve())
+                            .catch((error: Error) => reject(error));
+                    }
 
-                Dimmer.updateLevel(linked, level).catch((error: Error) => this.log.error(error.message));
-                return;
+                    break;
 
-            case LinkType.DimmerToFan:
-                speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
-                level = Dimmer.convertSpeed(speed);
+                case LinkType.DimmerToFan:
+                    speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
+                    level = Dimmer.convertSpeed(speed);
 
-                Fan.updateSpeed(device, linked, speed).catch((error: Error) => this.log.error(error.message));
-                return;
-        }
+                    Fan.updateSpeed(device, linked, speed)
+                        .then(() => resolve())
+                        .catch((error: Error) => error);
+                    break;
+
+                default:
+                    resolve();
+                    break;
+            }
+        });
     }
 
     /*
@@ -100,7 +121,7 @@ export class Links {
         if (device.id.includes("DOWNLIGHT")) {
             return this.getControl(device.id.replace("DOWNLIGHT", "UPLIGHT"));
         }
-        
+
         if (device.id.includes("UPLIGHT")) {
             return this.getControl(device.id.replace("UPLIGHT", "DOWNLIGHT"));
         }

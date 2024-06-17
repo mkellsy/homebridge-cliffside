@@ -82,12 +82,14 @@ export class Links {
                     level = (status as Leap.DimmerState).level;
                     opposing = this.getOpposing(linked);
 
-                    if (opposing != null) {
+                    if (opposing != null && opposing.status.state === "On") {
                         Dimmer.updateLevel(opposing, 0)
                             .then(() => {
-                                Dimmer.updateLevel(linked, level)
-                                    .then(() => resolve())
-                                    .catch((error: Error) => reject(error));
+                                setTimeout(() => {
+                                    Dimmer.updateLevel(linked, level)
+                                        .then(() => resolve())
+                                        .catch((error: Error) => reject(error));
+                                }, 100);
                             })
                             .catch((error: Error) => reject(error));
                     } else {

@@ -1,7 +1,6 @@
 import * as Leap from "@mkellsy/leap-client";
 
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
-import { DeviceState, Timeclock as ITimeclock } from "@mkellsy/hap-device";
 
 import { Common } from "./Common";
 import { Device } from "../Interfaces/Device";

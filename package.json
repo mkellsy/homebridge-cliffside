@@ -1,5 +1,5 @@
 {
-    "version": "1.5.7",
+    "version": "1.5.8",
     "name": "@mkellsy/homebridge-cliffside",
     "displayName": "Homebridge Cliffside",
     "description": "This is a highly customized plugin for a single location.",
@@ -11,6 +11,10 @@
     },
     "homepage": "https://github.com/mkellsy/homebridge-cliffside",
     "main": "lib/index.js",
+    "engines": {
+        "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+        "node": "^18.20.0 || ^20.15.0"
+    },
     "keywords": [
         "homebridge-plugin"
     ],

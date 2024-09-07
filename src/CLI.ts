@@ -8,6 +8,8 @@ import { Logger } from "./Logger";
 
 import { program } from "commander";
 
+const FAN_COUNT = 4;
+
 const log = Logger.log;
 
 program.option("-d, --debug", "enable debug logging");
@@ -27,6 +29,7 @@ program.command("devices").action(() => {
     Logger.configure(program);
 
     const devices: Device[] = [];
+    let fans: number = 0;
 
     Promise.all([
         new Promise<void>((resolve) => {
@@ -37,8 +40,12 @@ program.command("devices").action(() => {
         }),
         new Promise<void>((resolve) => {
             Baf.connect().on("Available", (items) => {
-                devices.push(...items);
-                resolve();
+                fans += 1;
+
+                if (fans === FAN_COUNT) {
+                    devices.push(...items);
+                    resolve();
+                }
             });
         }),
     ]).then(() => {
@@ -55,10 +62,12 @@ program.command("devices").action(() => {
 
         const controllable = devices
             .filter((device) => types.indexOf(device.type) >= 0)
-            .sort((a, b) => (a.name < b.name ? -1 : 1));
+            .sort((a, b) => (`${a.area.Name} ${a.name}` < `${b.area.Name} ${b.name}` ? -1 : 1));
 
         for (const device of controllable) {
-            log.info(`${device.name} ${Colors.cyan.dim(device.id)}`);
+            log.info(
+                `${device.name.startsWith(device.area.Name) ? device.name : `${device.area.Name} ${device.name}`} ${Colors.cyan.dim(device.id)}`,
+            );
         }
 
         process.exit();
@@ -73,7 +82,7 @@ program.command("keypads").action(() => {
     Leap.connect().on("Available", (devices) => {
         const keypads = devices
             .filter((device) => types.indexOf(device.type) >= 0)
-            .sort((a, b) => (a.name < b.name ? -1 : 1));
+            .sort((a, b) => (`${a.area.Name} ${a.name}` < `${b.area.Name} ${b.name}` ? -1 : 1));
 
         for (const keypad of keypads) {
             log.info(`${keypad.name} ${Colors.cyan.dim(keypad.id)}`);
@@ -91,7 +100,7 @@ program.command("buttons").action(() => {
     Leap.connect().on("Available", (devices) => {
         const keypads = devices
             .filter((device) => types.indexOf(device.type) >= 0)
-            .sort((a, b) => (a.name < b.name ? -1 : 1))
+            .sort((a, b) => (`${a.area.Name} ${a.name}` < `${b.area.Name} ${b.name}` ? -1 : 1))
             .map((device) => device as Keypad);
 
         for (const keypad of keypads) {
@@ -110,7 +119,7 @@ program.command("timeclocks").action(() => {
     Leap.connect().on("Available", (devices) => {
         const timeclocks = devices
             .filter((device) => device.type === DeviceType.Timeclock)
-            .sort((a, b) => (a.name < b.name ? -1 : 1))
+            .sort((a, b) => (`${a.area.Name} ${a.name}` < `${b.area.Name} ${b.name}` ? -1 : 1))
             .map((device) => device as Keypad);
 
         for (const timeclock of timeclocks) {

@@ -38,8 +38,7 @@ export abstract class Logger {
                 showHidden: false,
                 depth: Infinity,
                 colors: true,
-                compact: true,
-                breakLength: Infinity,
+                compact: false,
             }),
         );
     }

@@ -25,6 +25,29 @@ program.command("pair").action(() => {
         .finally(() => process.exit(0));
 });
 
+program
+    .command("read")
+    .argument("<string>", "url to send to the processor")
+    .action((url) => {
+        Logger.configure(program);
+
+        const location = Leap.connect();
+
+        location.on("Available", () => {
+            const id = location.processors[0];
+            const processor = location.processor(id);
+
+            if (processor == null) {
+                return process.exit();
+            }
+
+            processor
+                .read(url)
+                .then((response) => log.info(Logger.inspect(response)))
+                .finally(() => process.exit());
+        });
+    });
+
 program.command("devices").action(() => {
     Logger.configure(program);
 

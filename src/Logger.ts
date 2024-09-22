@@ -32,13 +32,14 @@ export abstract class Logger {
         return Console.get(name);
     }
 
-    static inspect(value: object): string {
+    static inspect(value: object, compact?: boolean): string {
         return Colors.dim(
             inspect(value, {
                 showHidden: false,
                 depth: Infinity,
                 colors: true,
-                compact: false,
+                compact: compact === true,
+                breakLength: Infinity,
             }),
         );
     }

@@ -4,11 +4,12 @@ import * as Interfaces from "@mkellsy/hap-device";
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
-import { Device } from "../Interfaces/Device";
+import { Device } from "./Device";
 import { Dimmer } from "./Dimmer";
 
 /**
  * Creates a fan device.
+ * @private
  */
 export class Fan extends Common<Baf.Fan> implements Device {
     private service: Service;
@@ -92,7 +93,7 @@ export class Fan extends Common<Baf.Fan> implements Device {
     /**
      * Converts a dimmer level to a fan speed.
      *
-     * @param level The dimmer brightness level.
+     * @param value The dimmer brightness level.
      * @param status The current status of the dimmer.
      *
      * @returns The speed value as a number.
@@ -185,8 +186,10 @@ export class Fan extends Common<Baf.Fan> implements Device {
 
     /**
      * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetState = (value: CharacteristicValue): void => {
+    private onSetState = async (value: CharacteristicValue): Promise<void> => {
         const state = value ? "On" : "Off";
         const speed = value ? 7 : 0;
 
@@ -194,14 +197,12 @@ export class Fan extends Common<Baf.Fan> implements Device {
             this.log.debug(`Fan Set State: ${this.device.name} ${state}`);
             this.log.debug(`Fan Set Speed: ${this.device.name} ${speed}`);
 
-            this.device
-                .set({
-                    state,
-                    speed,
-                    whoosh: this.device.status.whoosh,
-                    eco: this.device.status.eco || "Off",
-                })
-                .catch((error: Error) => this.log.error(error.message));
+            await this.device.set({
+                state,
+                speed,
+                whoosh: this.device.status.whoosh,
+                eco: this.device.status.eco || "Off",
+            });
         }
     };
 
@@ -219,9 +220,11 @@ export class Fan extends Common<Baf.Fan> implements Device {
     };
 
     /**
-     * Updates the device speed when a change comes in from Homebridge.
+     * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetSpeed = (value: CharacteristicValue): void => {
+    private onSetSpeed = async (value: CharacteristicValue): Promise<void> => {
         const speed = Math.round((((value as number) || 0) / 100) * 7);
         const state = speed > 0 ? "On" : "Off";
 
@@ -229,14 +232,12 @@ export class Fan extends Common<Baf.Fan> implements Device {
             this.log.debug(`Fan Set State: ${this.device.name} ${state}`);
             this.log.debug(`Fan Set Speed: ${this.device.name} ${speed}`);
 
-            this.device
-                .set({
-                    state,
-                    speed,
-                    whoosh: this.device.status.whoosh,
-                    eco: this.device.status.eco || "Off",
-                })
-                .catch((error: Error) => this.log.error(error.message));
+            await this.device.set({
+                state,
+                speed,
+                whoosh: this.device.status.whoosh,
+                eco: this.device.status.eco || "Off",
+            });
         }
     };
 
@@ -252,22 +253,22 @@ export class Fan extends Common<Baf.Fan> implements Device {
     };
 
     /**
-     * Updates the device auto state when a change comes in from Homebridge.
+     * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetAuto = (value: CharacteristicValue): void => {
+    private onSetAuto = async (value: CharacteristicValue): Promise<void> => {
         const state = value ? "Auto" : "Off";
 
         if (this.device.status.state !== state) {
             this.log.debug(`Fan Set State: ${this.device.name} ${state}`);
 
-            this.device
-                .set({
-                    state,
-                    speed: this.device.status.speed,
-                    whoosh: this.device.status.whoosh,
-                    eco: this.device.status.eco || "Off",
-                })
-                .catch((error: Error) => this.log.error(error.message));
+            await this.device.set({
+                state,
+                speed: this.device.status.speed,
+                whoosh: this.device.status.whoosh,
+                eco: this.device.status.eco || "Off",
+            });
         }
     };
 
@@ -283,22 +284,22 @@ export class Fan extends Common<Baf.Fan> implements Device {
     };
 
     /**
-     * Updates the device whoosh state when a change comes in from Homebridge.
+     * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetWhoosh = (value: CharacteristicValue): void => {
+    private onSetWhoosh = async (value: CharacteristicValue): Promise<void> => {
         const whoosh = value ? "On" : "Off";
 
         if (this.device.status.whoosh !== whoosh) {
             this.log.debug(`Fan Set Whoosh: ${this.device.name} ${whoosh}`);
 
-            this.device
-                .set({
-                    state: this.device.status.state as "On" | "Off" | "Auto",
-                    speed: this.device.status.speed,
-                    whoosh,
-                    eco: this.device.status.eco || "Off",
-                })
-                .catch((error: Error) => this.log.error(error.message));
+            await this.device.set({
+                state: this.device.status.state as "On" | "Off" | "Auto",
+                speed: this.device.status.speed,
+                whoosh,
+                eco: this.device.status.eco || "Off",
+            });
         }
     };
 
@@ -314,22 +315,22 @@ export class Fan extends Common<Baf.Fan> implements Device {
     };
 
     /**
-     * Updates the device eco state when a change comes in from Homebridge.
+     * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetEco = (value: CharacteristicValue): void => {
+    private onSetEco = async (value: CharacteristicValue): Promise<void> => {
         const eco = value ? "On" : "Off";
 
         if (this.device.status.eco !== eco) {
             this.log.debug(`Fan Set Eco: ${this.device.name} ${eco}`);
 
-            this.device
-                .set({
-                    state: this.device.status.state as "On" | "Off" | "Auto",
-                    speed: this.device.status.speed,
-                    whoosh: this.device.status.whoosh,
-                    eco,
-                })
-                .catch((error: Error) => this.log.error(error.message));
+            await this.device.set({
+                state: this.device.status.state as "On" | "Off" | "Auto",
+                speed: this.device.status.speed,
+                whoosh: this.device.status.whoosh,
+                eco,
+            });
         }
     };
 }

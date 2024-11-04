@@ -120,6 +120,7 @@ dist
 .tern-port
 
 # Stores VSCode versions used for testing VSCode extensions
+.vscode
 .vscode-test
 
 # yarn v2
@@ -132,5 +133,6 @@ dist
 # build output
 lib/
 storage/
+temp/
 authority
 links.json

@@ -2,6 +2,7 @@ import { Device, DeviceType } from "@mkellsy/hap-device";
 
 /**
  * Defines the available link types.
+ * @private
  */
 export enum LinkType {
     /**
@@ -28,6 +29,7 @@ export enum LinkType {
  * @param destination The linked device to be updated.
  *
  * @returns Returns the link type.
+ * @private
  */
 export function parseLinkType(source: Device, destination: Device): LinkType {
     if (source == null || destination == null) {

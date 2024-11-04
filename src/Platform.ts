@@ -5,7 +5,7 @@ import * as Interfaces from "@mkellsy/hap-device";
 import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig } from "homebridge";
 
 import { Accessories } from "./Accessories";
-import { Device } from "./Interfaces/Device";
+import { Device } from "./Device";
 import { Links } from "./Links";
 
 const accessories: Map<string, PlatformAccessory> = new Map();
@@ -18,6 +18,7 @@ export { accessories, devices, platform, plugin };
 
 /**
  * Impliments a Homebridge platform plugin.
+ * @private
  */
 export class Platform implements DynamicPlatformPlugin {
     private readonly log: Logging;

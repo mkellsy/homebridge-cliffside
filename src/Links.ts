@@ -7,12 +7,13 @@ import path from "path";
 
 import { Logging } from "homebridge";
 
-import { Dimmer } from "./Devices/Dimmer";
-import { Fan } from "./Devices/Fan";
-import { LinkType, parseLinkType } from "./Interfaces/LinkType";
+import { Dimmer } from "./Dimmer";
+import { Fan } from "./Fan";
+import { LinkType, parseLinkType } from "./LinkType";
 
 /**
  * Defines how devices are linked to each other.
+ * @private
  */
 export class Links {
     private readonly log: Logging;

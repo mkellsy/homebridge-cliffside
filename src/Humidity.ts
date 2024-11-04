@@ -3,10 +3,11 @@ import * as Baf from "@mkellsy/baf-client";
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
-import { Device } from "../Interfaces/Device";
+import { Device } from "./Device";
 
 /**
  * Creates a humidity sensor device.
+ * @private
  */
 export class Humidity extends Common<Baf.Humidity> implements Device {
     private service: Service;

@@ -3,10 +3,11 @@ import * as Leap from "@mkellsy/leap-client";
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
-import { Device } from "../Interfaces/Device";
+import { Device } from "./Device";
 
 /**
  * Creates a switch device.
+ * @private
  */
 export class Switch extends Common<Leap.Switch> implements Device {
     private service: Service;
@@ -57,14 +58,16 @@ export class Switch extends Common<Leap.Switch> implements Device {
 
     /**
      * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetState = (value: CharacteristicValue): void => {
+    private onSetState = async (value: CharacteristicValue): Promise<void> => {
         const state = value ? "On" : "Off";
 
         if (this.device.status.state !== state) {
             this.log.debug(`Switch Set State: ${this.device.name} ${state}`);
 
-            this.device.set({ state }).catch((error: Error) => this.log.error(error.message));
+            await this.device.set({ state });
         }
     };
 }

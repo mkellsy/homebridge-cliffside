@@ -4,10 +4,11 @@ import * as Interfaces from "@mkellsy/hap-device";
 import { API, CharacteristicValue, Logging, Service } from "homebridge";
 
 import { Common } from "./Common";
-import { Device } from "../Interfaces/Device";
+import { Device } from "./Device";
 
 /**
  * Creates a dimmer device.
+ * @private
  */
 export class Dimmer extends Common<Leap.Dimmer> implements Device {
     private service: Service;
@@ -42,7 +43,7 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
     /**
      * Converts a fan speed level to a dimmer level.
      *
-     * @param level The fan speed.
+     * @param speed The fan speed.
      *
      * @returns The brightness level as a number.
      */
@@ -55,10 +56,6 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
      *
      * @param device The device to update.
      * @param level The brightness level.
-     * @param toggled (Optional) The device that is oppiside the dimmer. For
-     *                BAF uplight and downlights can only be controled one at a
-     *                time, and only one can be on. While the app can sync the
-     *                two lights, only one can be controled.
      */
     public static updateLevel(device: Interfaces.Device, level: number): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -97,8 +94,10 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
 
     /**
      * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetState = (value: CharacteristicValue): void => {
+    private onSetState = async (value: CharacteristicValue): Promise<void> => {
         const state = value ? "On" : "Off";
         const level = value ? 100 : 0;
 
@@ -106,7 +105,7 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
             this.log.debug(`Dimmer Set State: ${this.device.name} ${state}`);
             this.log.debug(`Dimmer Set Brightness: ${this.device.name} ${level}`);
 
-            this.device.set({ state, level }).catch((error: Error) => this.log.error(error.message));
+            await this.device.set({ state, level });
         }
     };
 
@@ -123,8 +122,10 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
 
     /**
      * Updates the device when a change comes in from Homebridge.
+     *
+     * @param value The characteristic value from Homebrtidge.
      */
-    private onSetBrightness = (value: CharacteristicValue): void => {
+    private onSetBrightness = async (value: CharacteristicValue): Promise<void> => {
         const level = (value || 0) as number;
         const state = level > 0 ? "On" : "Off";
 
@@ -132,7 +133,7 @@ export class Dimmer extends Common<Leap.Dimmer> implements Device {
             this.log.debug(`Dimmer Set State: ${this.device.name} ${state}`);
             this.log.debug(`Dimmer Set Brightness: ${this.device.name} ${level}`);
 
-            this.device.set({ state, level }).catch((error: Error) => this.log.error(error.message));
+            await this.device.set({ state, level });
         }
     };
 }

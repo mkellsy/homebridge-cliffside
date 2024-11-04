@@ -104,4 +104,4 @@ Lambdas need to be stored in a folder at the same level as `.homebridge`. The fo
 
 ## Support
 
-I offer not support for this plugin, it is published only for personal use.
+I offer no support for this plugin, it is published only for personal use.

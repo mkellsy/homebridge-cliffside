@@ -1,5 +1,5 @@
 {
-    "version": "1.7.8",
+    "version": "1.7.9",
     "name": "@mkellsy/homebridge-cliffside",
     "displayName": "Homebridge Cliffside",
     "description": "This is a highly customized plugin for a single location.",
@@ -21,7 +21,8 @@
     "files": [
         "/lib",
         "/bin",
-        "authority"
+        "authority",
+        "config.schema.json"
     ],
     "bin": {
         "cliffside": "bin/cliffside"

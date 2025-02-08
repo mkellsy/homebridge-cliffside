@@ -1,3 +1,5 @@
+import { execSync } from "child_process";
+
 import * as Baf from "@mkellsy/baf-client";
 import * as Leap from "@mkellsy/leap-client";
 import * as Interfaces from "@mkellsy/hap-device";
@@ -40,6 +42,10 @@ export class Platform implements DynamicPlatformPlugin {
         this.homebridge = homebridge;
         this.links = new Links(this.log);
 
+        if (config._bridge?.port != null) {
+            execSync(`lsof -t -i tcp:${config._bridge.port} | xargs kill -9`);
+        }
+
         this.homebridge.on("didFinishLaunching", () => {
             this.leap = Leap.connect()
                 .on("Available", this.onAvailable)
@@ -47,9 +53,6 @@ export class Platform implements DynamicPlatformPlugin {
                 .on("Update", this.onUpdate);
             this.baf = Baf.connect().on("Available", this.onAvailable).on("Update", this.onUpdate);
         });
-
-        process.on("SIGINT", this.onExit);
-        process.on("SIGTERM", this.onExit);
     }
 
     /**
@@ -113,15 +116,5 @@ export class Platform implements DynamicPlatformPlugin {
         }
 
         accessory.onUpdate(status);
-    };
-
-    /*
-     * Closes client connnections on exit.
-     */
-
-    /* istanbul ignore next */
-    private onExit = (): void => {
-        this.leap?.close();
-        this.baf?.close();
     };
 }

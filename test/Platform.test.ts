@@ -12,6 +12,7 @@ registerNode();
 
 describe("Platform", () => {
     let homebridgeStub: any;
+    let execSyncStub: any;
     let configStub: any;
     let deviceStub: any;
     let buttonStub: any;
@@ -64,10 +65,17 @@ describe("Platform", () => {
                     };
                 },
             },
+            child_process: {
+                execSync: (...args: any) => {
+                    execSyncStub(...args);
+                },
+            },
         });
     });
 
     beforeEach(() => {
+        execSyncStub = sinon.stub();
+
         leapStub = { callbacks: {} };
         bafStub = { callbacks: {} };
 
@@ -191,6 +199,13 @@ describe("Platform", () => {
 
         expect(bafStub.callbacks["Available"]).to.not.be.undefined;
         expect(bafStub.callbacks["Update"]).to.not.be.undefined;
+    });
+
+    it("should attempt to close any existing process on configured port", () => {
+        configStub._bridge = { port: 54321 };
+        platform = new platformType(logStub, configStub, homebridgeStub);
+
+        expect(execSyncStub).to.be.calledWith("lsof -t -i tcp:54321 | xargs kill -9");
     });
 
     describe("onAvailable()", () => {

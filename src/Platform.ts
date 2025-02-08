@@ -25,6 +25,9 @@ export class Platform implements DynamicPlatformPlugin {
     private readonly homebridge: API;
     private readonly links: Links;
 
+    private leap?: Leap.Client;
+    private baf?: Baf.Client;
+
     /**
      * Creates an instance to this plugin.
      *
@@ -38,9 +41,15 @@ export class Platform implements DynamicPlatformPlugin {
         this.links = new Links(this.log);
 
         this.homebridge.on("didFinishLaunching", () => {
-            Leap.connect().on("Available", this.onAvailable).on("Action", this.onAction).on("Update", this.onUpdate);
-            Baf.connect().on("Available", this.onAvailable).on("Update", this.onUpdate);
+            this.leap = Leap.connect()
+                .on("Available", this.onAvailable)
+                .on("Action", this.onAction)
+                .on("Update", this.onUpdate);
+            this.baf = Baf.connect().on("Available", this.onAvailable).on("Update", this.onUpdate);
         });
+
+        process.on("SIGINT", this.onExit);
+        process.on("SIGTERM", this.onExit);
     }
 
     /**
@@ -104,5 +113,15 @@ export class Platform implements DynamicPlatformPlugin {
         }
 
         accessory.onUpdate(status);
+    };
+
+    /*
+     * Closes client connnections on exit.
+     */
+
+    /* istanbul ignore next */
+    private onExit = (): void => {
+        this.leap?.close();
+        this.baf?.close();
     };
 }

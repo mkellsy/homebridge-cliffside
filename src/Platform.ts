@@ -40,7 +40,7 @@ export class Platform implements DynamicPlatformPlugin {
     constructor(log: Logging, config: PlatformConfig, homebridge: API) {
         this.log = log;
         this.homebridge = homebridge;
-        this.links = new Links(this.log);
+        this.links = new Links();
 
         if (config._bridge?.port != null) {
             execSync(`lsof -t -i tcp:${config._bridge.port} | xargs kill -9`);

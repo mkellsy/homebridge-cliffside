@@ -14,7 +14,6 @@ describe("Links", () => {
     let linksType: typeof Links;
 
     let linksStub: any;
-    let loggerStub: any;
     let readFileStub: any;
 
     let convertSpeedStub: any;
@@ -51,11 +50,6 @@ describe("Links", () => {
         updateLevelStub = sinon.promise();
         updateSpeedStub = sinon.promise();
 
-        loggerStub = {
-            error: sinon.stub(),
-            debug: sinon.stub(),
-        };
-
         linksStub = JSON.stringify([
             ["LEAP-1-DIMMER-1", "BAF-1-FAN"],
             ["LEAP-2-DIMMER-2", "BAF-1-DOWNLIGHT"],
@@ -69,7 +63,7 @@ describe("Links", () => {
         ]);
 
         readFileStub = sinon.stub().returns(linksStub);
-        links = new linksType(loggerStub);
+        links = new linksType();
 
         [
             { id: "LEAP-0-DIMMER-0", type: "Dimmer", status: { state: "On" } },
@@ -97,8 +91,6 @@ describe("Links", () => {
 
     it("should not do anything if the device is not linked", () => {
         links.update({ id: "TEST_UNLINKED" } as any, { level: 100 } as any);
-
-        expect(loggerStub.debug).to.not.be.called;
     });
 
     describe("update()", () => {
@@ -122,10 +114,6 @@ describe("Links", () => {
                 if (TEST_CASE.type === "Dimmer") {
                     updateLevelStub.resolve();
                     updateSpeedStub.resolve();
-
-                    expect(loggerStub.debug).to.be.called;
-                } else {
-                    expect(loggerStub.debug).to.not.be.called;
                 }
             });
 
@@ -135,10 +123,6 @@ describe("Links", () => {
                 if (TEST_CASE.type === "Dimmer") {
                     updateLevelStub.reject();
                     updateSpeedStub.reject();
-
-                    expect(loggerStub.debug).to.be.called;
-                } else {
-                    expect(loggerStub.debug).to.not.be.called;
                 }
             });
         });

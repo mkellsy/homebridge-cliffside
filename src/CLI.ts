@@ -1,9 +1,11 @@
 import * as Baf from "@mkellsy/baf-client";
 import * as Leap from "@mkellsy/leap-client";
+import * as Interfaces from "@mkellsy/hap-device";
 
 import Colors from "colors";
 
 import { Device, DeviceType, Keypad } from "@mkellsy/hap-device";
+import { Links } from "./Links";
 import { Logger } from "./Logger";
 
 import { program } from "commander";
@@ -23,6 +25,28 @@ program.command("pair").action(() => {
         .then(() => log.info("Processor paired"))
         .catch((error: Error) => log.error(Colors.red(error.message)))
         .finally(() => process.exit(0));
+});
+
+program.command("standalone").action(() => {
+    Logger.configure(program);
+
+    const links = new Links();
+
+    Leap.connect()
+        .on("Available", (devices: Interfaces.Device[]): void => {
+            for (const device of devices) {
+                links.set(device);
+            }
+        })
+        .on("Update", links.update);
+
+    Baf.connect()
+        .on("Available", (devices: Interfaces.Device[]): void => {
+            for (const device of devices) {
+                links.set(device);
+            }
+        })
+        .on("Update", links.update);
 });
 
 program

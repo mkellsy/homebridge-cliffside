@@ -5,8 +5,6 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-import { Logging } from "homebridge";
-
 import { Dimmer } from "./Dimmer";
 import { Fan } from "./Fan";
 import { LinkType, parseLinkType } from "./LinkType";
@@ -16,16 +14,12 @@ import { LinkType, parseLinkType } from "./LinkType";
  * @private
  */
 export class Links {
-    private readonly log: Logging;
-
     private readonly links: Map<string, string> = new Map();
     private readonly filename = path.join(os.homedir(), ".leap/links.json");
 
     private readonly devices: Map<string, Interfaces.Device> = new Map();
 
-    constructor(log: Logging) {
-        this.log = log;
-
+    constructor() {
         try {
             const contents = fs.readFileSync(this.filename).toString();
             const values: string[][] = JSON.parse(contents);
@@ -61,7 +55,7 @@ export class Links {
             return;
         }
 
-        this.syncDevices(device, linked, status).catch((error: Error) => this.log.error(error.message));
+        this.syncDevices(device, linked, status).catch((error: Error) => console.error(error.message));
     }
 
     /*
@@ -82,11 +76,10 @@ export class Links {
                 level = (status as Leap.DimmerState).level;
                 opposing = this.getOpposing(linked);
 
-                this.log.debug(`Linked dimmer ${linked.id}`);
+                console.debug(`Linked dimmer ${linked.id}`);
 
                 if (opposing != null && opposing.status.state === "On" && level > 0) {
-                    this.log.debug(`Oposing dimmer ${opposing.id}`);
-
+                    console.debug(`Oposing dimmer ${opposing.id}`);
                     await Dimmer.updateLevel(opposing, 0);
 
                     setTimeout(async () => {
@@ -102,7 +95,7 @@ export class Links {
                 speed = Fan.convertLevel((status as Leap.DimmerState).level, linked.status);
                 level = Dimmer.convertSpeed(speed);
 
-                this.log.debug(`Linked fan ${linked.id}`);
+                console.debug(`Linked fan ${linked.id}`);
 
                 await Fan.updateSpeed(device, linked, speed);
                 break;
